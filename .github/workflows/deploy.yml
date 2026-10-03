@@ -28,6 +28,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            web
+            package.json
+            package-lock.json
+            vite.config.js
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -36,7 +42,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm i
+        run: npm сi
 
       - name: Build Website
         run: npm run web-build # Запускает сборку. Убедитесь, что эта команда собирает именно в web/dist
