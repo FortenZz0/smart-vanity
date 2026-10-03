@@ -7,11 +7,11 @@
     "web-dev": "vite --mode web",
     "web-build": "vite build --mode web",
     "web-preview": "vite preview --mode web",
-    "mob-dev": "vite --mode mobile",
-    "mob-build": "vite build --mode mobile",
-    "mob-preview": "vite preview --mode mobile",
+    "android-dev": "vite --mode mobile",
+    "android-build": "vite build --mode mobile",
+    "android-preview": "vite preview --mode mobile",
     "android-init": "npx cap add android && npx cap sync android",
-    "android-dev": "npx cap sync android && npx cap open android"
+    "android-open": "npx cap sync android && npx cap open android"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.2",

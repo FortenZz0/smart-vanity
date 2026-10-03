@@ -34,17 +34,17 @@ npm run web-preview
 ```bash
 npm run android-init
 ```
-Запуск локального сервера на основе папки _/mobile/**app**_ сервера для **mobile** приложения (для разработки)
+Запуск локального сервера на основе папки _/mobile/**app**_ сервера для **android** приложения (для разработки)
 ```bash
-npm run mod-dev
+npm run android-dev
 ```
-Сборка **mobile** приложения (создаётся папка _/mobile/dist_)
+Сборка **android** приложения (создаётся папка _/mobile/dist_)
 ```bash
-npm run mob-build
+npm run android-build
 ```
-Запуск локального сервера на основе папки _/mobile/**dist**_ сервера для **mobile** приложения (для проверки сборки)
+Запуск локального сервера на основе папки _/mobile/**dist**_ сервера для **android** приложения (для проверки сборки)
 ```bash
-npm run mob-preview
+npm run android-preview
 ```
 Синхронизация android платформы и запуск AndroidStudio для дальнейшей сборки .APK файла
 ```bash
