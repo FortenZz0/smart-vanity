@@ -149,7 +149,7 @@ vite.config.ts.timestamp-*
 .turbo
 
 
-package-lock.json
+# package-lock.json
 node-modules
 
 # Logs
