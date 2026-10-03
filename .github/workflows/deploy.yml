@@ -3,7 +3,8 @@ name: Deploy Web App to Github Pages
 on:
   push:
     branches: [ main ] # Скрипт будет срабатывать при каждом пуше в ветку main
-    paths: "/web/app/**" # Скрипт будет срабатывать только при изменениях в папке /web/app
+    paths:
+      - 'web/app/**' # Скрипт будет срабатывать только при изменениях в папке /web/app
 
 # Разрешаем скрипту записывать данные в GitHub Pages
 permissions:
