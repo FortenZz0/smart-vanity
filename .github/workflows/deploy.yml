@@ -7,6 +7,7 @@ on:
       - 'web/app/**' # Скрипт будет срабатывать только при изменениях в папке /web/app
       - 'vite.config.js'
       - 'package.json'
+  workflow_dispatch:
 
 # Разрешаем скрипту записывать данные в GitHub Pages
 permissions:
