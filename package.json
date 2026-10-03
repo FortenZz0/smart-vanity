@@ -9,14 +9,20 @@
     "web-preview": "vite preview --mode web",
     "mob-dev": "vite --mode mobile",
     "mob-build": "vite build --mode mobile",
-    "mob-preview": "vite preview --mode mobile"
+    "mob-preview": "vite preview --mode mobile",
+    "android-init": "npx cap add android && npx cap sync android",
+    "android-dev": "npx cap sync android && npx cap open android"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
     "glob": "^13.0.6",
     "sass": "^1.105.1",
     "vite": "^8.3.2",
     "vite-plugin-full-reload": "^1.2.0",
     "vite-plugin-html-minifier": "^1.0.5",
     "vite-plugin-nunjucks": "^0.2.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.2"
   }
 }

@@ -1,0 +1,6 @@
+{
+  "appId": "ru.smartvanity.app",
+  "appName": "Smart Vanity",
+  "webDir": "mobile/dist",
+  "zoomEnabled": false
+}
