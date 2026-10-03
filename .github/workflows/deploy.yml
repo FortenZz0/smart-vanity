@@ -42,9 +42,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-            - npm install --package-lock-only
-            - npm ci
+        run: npm i
 
       - name: Build Website
         run: npm run web-build # Запускает сборку. Убедитесь, что эта команда собирает именно в web/dist
