@@ -48,5 +48,5 @@ npm run android-preview
 ```
 Синхронизация android платформы и запуск AndroidStudio для дальнейшей сборки .APK файла
 ```bash
-npm run android-dev
+npm run android-open
 ```
