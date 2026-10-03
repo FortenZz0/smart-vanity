@@ -42,7 +42,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm сi
+        run: npm ci
 
       - name: Build Website
         run: npm run web-build # Запускает сборку. Убедитесь, что эта команда собирает именно в web/dist
