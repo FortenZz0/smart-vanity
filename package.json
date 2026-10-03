@@ -1,0 +1,22 @@
+{
+  "name": "smart-vanity",
+  "private": false,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "web-dev": "vite --mode web",
+    "web-build": "vite build --mode web",
+    "web-preview": "vite preview --mode web",
+    "mob-dev": "vite --mode mobile",
+    "mob-build": "vite build --mode mobile",
+    "mob-preview": "vite preview --mode mobile"
+  },
+  "devDependencies": {
+    "glob": "^13.0.6",
+    "sass": "^1.105.1",
+    "vite": "^8.3.2",
+    "vite-plugin-full-reload": "^1.2.0",
+    "vite-plugin-html-minifier": "^1.0.5",
+    "vite-plugin-nunjucks": "^0.2.0"
+  }
+}
