@@ -56,6 +56,8 @@ export default defineConfig((command) => {
         // mobile root - "./mobile/app"
         root: command.mode == "web" ? "./web/app" : "./mobile/app", // назначаем корневую директорию проекта
 
+        base: '/smart-vanity/', // публичный базовый путь для корректной работы на GitHub Pages
+
         clearScreen: false, // отключаем очистку консоли при запуске сервера
     }
 

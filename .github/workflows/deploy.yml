@@ -1,0 +1,48 @@
+name: Deploy Web App to Github Pages
+
+on:
+  push:
+    branches: [ main ] # Скрипт будет срабатывать при каждом пуше в ветку main
+    paths: [ "web/app" ] # Скрипт будет срабатывать только при изменениях в папке web/app
+
+# Разрешаем скрипту записывать данные в GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Website
+        run: npm run web-build # Запускает сборку. Убедитесь, что эта команда собирает именно в web/dist
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Указываем точный путь до вашей папки с готовым билдом
+          path: './web/dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
