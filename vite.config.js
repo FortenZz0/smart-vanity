@@ -19,13 +19,19 @@ import htmlMinifier from 'vite-plugin-html-minifier'
 const get_pages = (m) => {
     let root_path = m == "web" ? "./web/app" : "./mobile/app";
 
-    const pages = Object.fromEntries(glob.sync(root_path + "/**/*.html").map(file => [
-        path.relative(
-            root_path,
-            file.slice(0, file.length - path.extname(file).length)
-        ),
-        fileURLToPath(new URL(file, import.meta.url))
-    ]))
+    var pages = Object.fromEntries(
+        glob.sync(root_path + "/**/*.html", {
+            ignore: [
+                root_path + "/**/cmp/**/*.html", // игнорируем компоненты
+            ]
+        }).map(file => [
+            path.relative(
+                root_path,
+                file.slice(0, file.length - path.extname(file).length)
+            ),
+            fileURLToPath(new URL(file, import.meta.url))
+        ]
+    ));
 
     console.log("detected pages:");
     console.log(pages);
@@ -52,9 +58,9 @@ const get_pages = (m) => {
 
 export default defineConfig((command) => {
     const global = {
-        // web root - "./web/app"
-        // mobile root - "./mobile/app"
-        root: command.mode == "web" ? "./web/app" : "./mobile/app", // назначаем корневую директорию проекта
+        // web root - "./web/app/"
+        // mobile root - "./mobile/app/"
+        root: command.mode == "web" ? "./web/app/" : "./mobile/app/", // назначаем корневую директорию проекта
 
         base: '/smart-vanity/', // публичный базовый путь для корректной работы на GitHub Pages
 
