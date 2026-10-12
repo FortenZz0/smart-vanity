@@ -1,0 +1,24 @@
+{% import "./../data.njk" as data %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
+</head>
+<body>
+
+    {% include "./header/index.html" %}
+    
+    <main>
+        {% block main %}
+        {% endblock %}
+    </main>
+
+    {% include "./footer/index.html" %}
+
+    <script src="main.js" type="module"></script>
+</body>
+</html>
