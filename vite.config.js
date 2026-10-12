@@ -109,8 +109,14 @@ export default defineConfig((command) => {
         //     }
         // }),
 
-        // автоматическое обновление всего приложения при изменении .njk файлов
-        FullReload(['config/routes.rb', (command.mode == "web" ? "./web" : "./mobile") + "/app/**/*.njk"], {always: true}),
+        // автоматическое обновление всего приложения при изменении .njk (теперь любых) файлов
+        FullReload(
+            [
+                'config/routes.rb',
+                (command.mode == "web" ? "./web" : "./mobile") + "/app/**/*",
+            ],
+            {always: true}
+        ),
 
         // Минификация html при сборке
         htmlMinifier({
