@@ -1,20 +1,22 @@
-<header class="container w-100 py-5 d-flex justify-content-between">
-    <div class="logo">
-        <a href="#" class="d-flex align-items-center">
-            <img src="./logo.png" alt="" class="me-2">
-            <h1>Smart Vantiy</h1>
-        </a>
-    </div>
+<header class="w-100">
+    <div class="container py-5 d-flex justify-content-between">
+        <div class="logo">
+            <a href="#" class="d-flex align-items-end">
+                <img src="./logo.png" alt="" class="me-4">
+                <h1 class="m-0 mb-2">Smart Vantiy</h1>
+            </a>
+        </div>
 
-    <nav>
-        <ul class="h-100 d-flex align-items-center">
-            {% for item in data.nav_content %}
-                <li class="ms-4">
-                    <a href="{{ item.href }}" class="fs-4">
-                        {{ item.title }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    </nav>
+        <nav>
+            <ul class="h-100 d-flex align-items-end">
+                {% for item in data.nav_content %}
+                    <li class="ms-4 mb-2">
+                        <a href="{{ item.href }}" class="fs-4">
+                            {{ item.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
 </header>
