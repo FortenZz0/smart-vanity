@@ -1,0 +1,54 @@
+header
+    .logo
+        img
+            width: 75px
+            transition: 0.3s ease-out
+
+            &::before
+                content: ''
+                display: block
+                width: 100%
+                height: 100%
+                background-image: url(./logo.png)
+                opacity: 0
+        
+        h1
+            color: var(--color-accent-1)
+            font-weight: 700
+            font-size: 36px
+            transition: 0.3s ease-out
+            // font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+        
+        &:hover
+            img
+                filter: brightness(1.05)
+            h1
+                color: var(--color-accent-2)
+
+
+
+    nav
+        a
+            position: relative
+            display: block
+            width: 100%
+            height: 100%
+
+            &::before
+                content: ''
+                position: absolute
+                pointer-events: none
+                bottom: -8px
+                left: 50%
+                transform: translateX(-50%)
+
+                background-color: var(--color-accent-1)
+                transition: inherit
+                height: 2px
+                width: 0px
+
+        li:hover a::before
+                width: calc(100% - 20px)
+                background-color: var(--color-accent-2)
+
+                

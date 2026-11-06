@@ -1,5 +1,40 @@
-p
+// Цветовые схемы
+body
+    &.color-scheme-1
+        --color-background: #fdf8f7
+        --color-accent-1:   #59352d
+        --color-accent-2:   #ac7963
+        // --color-text:       #231612
+        --color-text:       var(--color-accent-1)
+
+
+body
+    background: var(--color-background)
+
+
+
+a, p, li, div
     font-family: 'Montserrat', sans-serif
-    font-weight: 600
-    font-size: 24px
-    color: red
+    font-weight: 500
+    font-size: 18px
+    color: var(--color-text)
+
+a
+    text-decoration: none
+    transition: 0.3s ease-out
+
+    &.link
+        color: var(--color-accent-1)
+        text-decoration: underline
+
+    &:hover
+        color: var(--color-accent-2)
+
+    
+
+ul, ol
+    list-style: none
+    padding: 0
+    margin: 0
+
+
