@@ -1,12 +1,20 @@
 // Цветовые схемы
 body
     &.color-scheme-1
-        --color-background: #fdf8f7
-        --color-accent-1:   #59352d
-        --color-accent-2:   #ac7963
+        --color-background:  #fdf8f7
+        --color-accent-1:    #59352d
+        --color-accent-2:    #ac7963
         // --color-text:       #231612
-        --color-text:       var(--color-accent-1)
-        --color-text-light: var(--color-background)
+        --color-text:        var(--color-accent-1)
+        --color-text-light:  var(--color-background)
+    &.color-scheme-2
+        --color-background:  #FFF5F6
+        --color-accent-1:    #853846
+        --color-accent-2:    #E49FAD
+        // --color-text:       #231612
+        --color-text:        var(--color-accent-1)
+        --color-text-light:  var(--color-background)
+        --hover-filter:      brightness(1.4) saturate(.9)
 
 
 // body
@@ -44,11 +52,11 @@ a.btn
     text-align: center
     padding: 15px 30px
     width: max-content
-    background: var(--color-accent-2)
+    background: var(--color-accent-1)
     font-weight: 600
-    color: var(--color-text-light)
-    transition-duration: .4s
+    color: white
+    transition: .4s ease-out
 
     &:hover
-        background: var(--color-accent-1)
+        filter: var(--hover-filter)
         color: var(--color-text-light)
