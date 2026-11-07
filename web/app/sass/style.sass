@@ -6,11 +6,11 @@ body
         --color-accent-2:   #ac7963
         // --color-text:       #231612
         --color-text:       var(--color-accent-1)
+        --color-text-light: var(--color-background)
 
 
 // body
 //     background: var(--color-background)
-
 
 
 a, p, li, div
@@ -38,3 +38,17 @@ ul, ol
     margin: 0
 
 
+
+a.btn
+    display: block
+    text-align: center
+    padding: 15px 30px
+    width: max-content
+    background: var(--color-accent-2)
+    font-weight: 600
+    color: var(--color-text-light)
+    transition-duration: .4s
+
+    &:hover
+        background: var(--color-accent-1)
+        color: var(--color-text-light)
