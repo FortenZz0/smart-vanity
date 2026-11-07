@@ -14,5 +14,5 @@ $(window).on("scroll", () => {
         // $("header .container").addClass("py-5")
     }
 
-    console.log(scroll)
+    // console.log(scroll)
 })
