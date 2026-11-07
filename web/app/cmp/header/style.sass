@@ -1,10 +1,20 @@
 header
     position: fixed
     top: 0
+    background-color: none
+    transition: .3s ease-out
+
+    .container
+        transition: .3s ease-out
+
+    &.scrolled
+        background-color: var(--color-background)
+
 
     .logo
         img
-            height: 80px
+            height: 70px
+            margin-bottom: 10px
             transition: 0.3s ease-out
 
             &::before
