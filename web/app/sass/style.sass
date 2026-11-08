@@ -1,17 +1,21 @@
+@use "sass:color"
+
+$base-color: #ff5733 // Ваша HEX-переменная
+$transparent-color: color.change($base-color, $alpha: 0.5)
+    
 // Цветовые схемы
 body
     &.color-scheme-1
         --color-background:  #fdf8f7
         --color-accent-1:    #59352d
         --color-accent-2:    #ac7963
-        // --color-text:       #231612
         --color-text:        var(--color-accent-1)
         --color-text-light:  var(--color-background)
+        --hover-filter:      brightness(1.4) saturate(.9)
     &.color-scheme-2
         --color-background:  #FFF5F6
         --color-accent-1:    #853846
         --color-accent-2:    #E49FAD
-        // --color-text:       #231612
         --color-text:        var(--color-accent-1)
         --color-text-light:  var(--color-background)
         --hover-filter:      brightness(1.4) saturate(.9)
@@ -60,3 +64,25 @@ a.btn
     &:hover
         filter: var(--hover-filter)
         color: var(--color-text-light)
+
+
+
+.anim
+    &.floating-top-down
+        --distanceX: 5px
+        --distanceY: -10px
+        transform: translate(0, 0)
+
+        animation: floatingTopDown 5s ease-in-out infinite
+        // animation-duration: 8s !important
+        // will-change: transform
+
+        @keyframes floatingTopDown
+            0%
+                transform: translate(0, 0)
+            50%
+                transform: translate(var(--distanceX), var(--distanceY))
+            100%
+                transform: translate(0, 0)
+
+
