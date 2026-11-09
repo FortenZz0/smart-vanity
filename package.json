@@ -11,7 +11,8 @@
     "android-build": "vite build --mode mobile",
     "android-preview": "vite preview --mode mobile",
     "android-init": "npx cap add android && npx cap sync android",
-    "android-open": "npx cap sync android && npx cap open android"
+    "android-open": "npx cap sync android && npx cap open android",
+    "android-run": "npm run android-build && npx cap run android"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.2",

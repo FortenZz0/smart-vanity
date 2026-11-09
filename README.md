@@ -48,3 +48,11 @@ npm run android-preview
 ```bash
 npm run android-open
 ```
+
+Сборка мобильного интерфейса, синхронизация Android-проекта, сборка и запуск приложения на эмуляторе или подключённом телефоне:
+```bash
+npm run android-run
+```
+Команда сначала выполняет `android-build`, затем `npx cap run android`. Если доступно несколько устройств, появится выбор устройства для запуска.
+
+Для запуска необходимы установленная Android Studio с Android SDK и настроенная переменная `JAVA_HOME`, указывающая на JDK (обычно 'C:\Program Files\Android\Android Studio\jbr').
