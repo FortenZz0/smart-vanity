@@ -1,5 +1,9 @@
 {% extends "./mobile/app/cmp/base.html" %}
 
 {% block main %}
-    
+    <div class="pages">
+        {% include "./mobile/app/cmp/pages/home/index.html" %}
+        {% include "./mobile/app/cmp/pages/test/index.html" %}
+        {% include "./mobile/app/cmp/pages/settings/index.html" %}
+    </div>
 {% endblock %}
