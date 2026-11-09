@@ -1,4 +1,5 @@
 $(window).on("scroll", () => {
+    return;
     const scroll = $(window).scrollTop()
 
     if (scroll >= 100)
