@@ -28,25 +28,25 @@ npm run web-preview
 ```
 
 ### Команды ANDROID разработки
-Мобильное приложение находится в npm workspace `mobile`. Корневые команды `android-*` запускают скрипты из `mobile/package.json`.
+Мобильное приложение находится в npm workspace `mobile`.
 
-Первая сборка и создание проекта Android в `mobile/android`
+Перед первым открытием проекта в Android Studio выполните эту команду из корня репозитория. Она собирает мобильное приложение и создаёт `mobile/android`.
 ```bash
-npm run android-init
+npm run android:init
 ```
 Запуск локального сервера на основе папки _/mobile/**app**_ сервера для **android** приложения (для разработки)
 ```bash
-npm run android-dev
+npm run mobile:dev
 ```
 Сборка **android** приложения (создаётся папка _/mobile/dist_)
 ```bash
-npm run android-build
+npm run mobile:build
 ```
 Запуск локального сервера на основе папки _/mobile/**dist**_ сервера для **android** приложения (для проверки сборки)
 ```bash
-npm run android-preview
+npm run mobile:preview
 ```
 Синхронизация текущей сборки и запуск Android Studio для сборки APK
 ```bash
-npm run android-open
+npm run android:open
 ```

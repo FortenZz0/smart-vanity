@@ -1,6 +1,10 @@
+<script setup lang="ts">
+import { RouterView } from 'vue-router'
+</script>
+
 <template>
-  <main class="welcome">
-    <h1>Привет, мир!</h1>
+  <main class="screen">
+    <RouterView />
   </main>
 </template>
 
@@ -10,7 +14,7 @@ body {
   font-family: system-ui, sans-serif;
 }
 
-.welcome {
+.screen {
   box-sizing: border-box;
   display: grid;
   min-height: 100vh;
@@ -20,7 +24,7 @@ body {
   text-align: center;
 }
 
-.welcome h1 {
+.screen h1 {
   margin: 0;
 }
 </style>
