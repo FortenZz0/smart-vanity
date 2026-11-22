@@ -3,12 +3,14 @@ import { ref, watch } from 'vue'
 export const themes = [
   { value: 'light', label: 'themeLight' },
   { value: 'dark', label: 'themeDark' },
+  { value: 'system', label: 'themeSystem' },
 ] as const
 
 type Theme = typeof themes[number]['value']
 
-const defaultTheme: Theme = 'light'
+const defaultTheme: Theme = 'system'
 const storageKey = 'smart-vanity.theme'
+const systemColorScheme = window.matchMedia('(prefers-color-scheme: dark)')
 
 function readSavedTheme(): Theme {
   try {
@@ -20,11 +22,16 @@ function readSavedTheme(): Theme {
 }
 
 function applyTheme(value: Theme) {
-  document.documentElement.dataset.theme = value
+  const systemTheme = systemColorScheme.matches ? 'dark' : 'light'
+  document.documentElement.dataset.theme = value === 'system' ? systemTheme : value
 }
 
 export const theme = ref<Theme>(readSavedTheme())
 applyTheme(theme.value)
+
+systemColorScheme.addEventListener('change', () => {
+  if (theme.value === 'system') applyTheme('system')
+})
 
 watch(theme, (value) => {
   applyTheme(value)
