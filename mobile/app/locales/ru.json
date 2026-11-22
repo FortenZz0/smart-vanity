@@ -51,6 +51,9 @@
   "productEffectiveExpiry": "Итоговый срок годности — {date}",
   "productDatesInvalid": "Проверьте даты и длительность срока годности.",
   "saveProduct": "Сохранить",
-  "cancel": "Отмена",
-  "productSaveError": "Не удалось сохранить товар. Попробуйте ещё раз."
+  "back": "Назад",
+  "deleteProduct": "Удалить",
+  "confirmDeleteProduct": "Удалить этот товар без возможности восстановления?",
+  "productSaveError": "Не удалось сохранить товар. Попробуйте ещё раз.",
+  "productDeleteError": "Не удалось удалить товар. Попробуйте ещё раз."
 }

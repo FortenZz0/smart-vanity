@@ -69,6 +69,10 @@ export function restoreProduct(id: string): Promise<void> {
   return writeDatabase('UPDATE products SET archived_at = NULL WHERE id = ? AND archived_at IS NOT NULL', [id])
 }
 
+export function deleteProduct(id: string): Promise<void> {
+  return writeDatabase('DELETE FROM products WHERE id = ?', [id])
+}
+
 export function saveProduct(product: Product): Promise<void> {
   const { expiry } = product
   const shelfLife = expiry?.kind === 'shelfLife' ? expiry : null

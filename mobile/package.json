@@ -11,7 +11,8 @@
     "typecheck": "vue-tsc --noEmit -p app/tsconfig.json",
     "preview": "vite preview --mode mobile",
     "android:init": "npm run build && cap add android",
-    "android:open": "cap sync android && cap open android"
+    "android:open": "cap sync android && cap open android",
+    "android:sync": "cap sync android"
   },
   "dependencies": {
     "@capacitor-community/sqlite": "^8.1.1",

@@ -4,7 +4,7 @@ import { RouterLink, useRouter } from 'vue-router'
 import { getProductExpiry, parseCalendarDate } from '../features/products/expiry'
 import type { ExpiryInput, Product, ShelfLifeUnit } from '../features/products/product'
 import { discardUnattachedProductPhoto, getProductPhoto, saveProductPhoto } from '../features/products/productPhotos'
-import { getProduct, saveProduct } from '../features/products/productRepository'
+import { deleteProduct, getProduct, saveProduct } from '../features/products/productRepository'
 import { locale, translate } from '../locales'
 
 const props = defineProps<{ productId?: string }>()
@@ -28,7 +28,7 @@ const photoLoading = ref(false)
 const photoFailed = ref(false)
 const hasPhoto = computed(() => !!photo.value || !!storedPhotoId.value)
 const saving = ref(false)
-const saveFailed = ref(false)
+const actionError = ref<'productSaveError' | 'productDeleteError' | null>(null)
 const datesInvalid = ref(false)
 let newProductId: string | undefined
 
@@ -159,6 +159,36 @@ async function discardPhoto(id: string) {
   })
 }
 
+function goBack() {
+  if (router.options.history.state.back) {
+    router.back()
+  } else {
+    void router.replace({ name: 'home' })
+  }
+}
+
+async function removeProduct() {
+  const product = originalProduct.value
+  if (!product || saving.value || !window.confirm(translate('confirmDeleteProduct'))) return
+
+  const submittedFrom = router.currentRoute.value
+  saving.value = true
+  actionError.value = null
+
+  try {
+    await deleteProduct(product.id)
+    if (product.photoId) await discardPhoto(product.photoId)
+    if (router.currentRoute.value === submittedFrom) {
+      await router.replace({ name: 'home' })
+    }
+  } catch (error) {
+    console.error('Failed to delete the product', error)
+    actionError.value = 'productDeleteError'
+  } finally {
+    saving.value = false
+  }
+}
+
 async function submitProduct(event: SubmitEvent) {
   if (loadState.value !== 'ready' || !name.value || saving.value || photoLoading.value) return
 
@@ -173,7 +203,7 @@ async function submitProduct(event: SubmitEvent) {
   if (original && action === 'archive' && archivedAt === null) archivedAt = new Date().toISOString()
   if (action === 'restore') archivedAt = null
   saving.value = true
-  saveFailed.value = false
+  actionError.value = null
   let addedPhoto: string | null = null
 
   try {
@@ -195,7 +225,7 @@ async function submitProduct(event: SubmitEvent) {
   } catch (error) {
     if (addedPhoto) await discardPhoto(addedPhoto)
     console.error('Failed to save the product', error)
-    saveFailed.value = true
+    actionError.value = 'productSaveError'
   } finally {
     saving.value = false
   }
@@ -204,6 +234,9 @@ async function submitProduct(event: SubmitEvent) {
 
 <template>
   <section>
+    <button class="product-editor__back" type="button" @click="goBack">
+      <span aria-hidden="true">←</span> {{ translate('back') }}
+    </button>
     <h1>{{ translate(productId ? 'editProduct' : 'addProduct') }}</h1>
     <p v-if="loadState === 'loading'" role="status">{{ translate('productLoading') }}</p>
     <div v-else-if="loadState === 'missing'">
@@ -316,15 +349,27 @@ async function submitProduct(event: SubmitEvent) {
           >
             {{ translate(originalProduct.archivedAt === null ? 'archiveProduct' : 'restoreProduct') }}
           </button>
-          <RouterLink :to="{ name: 'home' }" replace>{{ translate('cancel') }}</RouterLink>
+          <button v-if="originalProduct" class="product-form__delete" type="button" @click="removeProduct">
+            {{ translate('deleteProduct') }}
+          </button>
         </div>
-        <p v-if="saveFailed" role="alert">{{ translate('productSaveError') }}</p>
+        <p v-if="actionError" role="alert">{{ translate(actionError) }}</p>
       </fieldset>
     </form>
   </section>
 </template>
 
 <style scoped>
+.product-editor__back {
+  margin-block-end: 0.5rem;
+  padding: 0.25rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  font: inherit;
+}
+
 .product-form {
   display: grid;
   gap: 1rem;
@@ -462,29 +507,36 @@ async function submitProduct(event: SubmitEvent) {
 }
 
 .product-form__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0.5rem;
 }
 
 .product-form__actions button {
-  padding: 0.625rem 1rem;
+  min-block-size: 2.75rem;
+  padding: 0.5rem;
   border: 0;
   border-radius: 0.375rem;
   background: var(--color-accent);
   color: var(--color-on-accent);
   font: inherit;
+  overflow-wrap: anywhere;
 }
 
 .product-form__actions button:disabled {
   opacity: 0.55;
 }
 
-.product-form__actions .product-form__archive {
+.product-form__actions :is(.product-form__archive, .product-form__delete) {
   border: 1px solid var(--color-divider);
   background: var(--color-surface);
   color: var(--color-text);
+}
+
+.product-form__actions .product-form__delete {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .product-form p {
