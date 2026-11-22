@@ -19,6 +19,7 @@
     "android:sync": "npm run android:sync -- workspace mobile --",
   
     "server:deploy": "npm run deploy --workspace server --",
+    "server:deploy:test": "npm run deploy:test --workspace server --",
     "server:start": "npm run start --workspace server --"
   },
   "devDependencies": {

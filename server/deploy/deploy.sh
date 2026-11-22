@@ -1,9 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-root=/opt/smart-vanity
-service=smart-vanity-api.service
-public_health=https://smartvanity.filinda.ru/api/health
+case "${0##*/}" in
+  smart-vanity-deploy|deploy.sh)
+    root=/opt/smart-vanity
+    service=smart-vanity-api.service
+    port=3000
+    public_health=https://smartvanity.filinda.ru/api/health
+    public_status=200
+    ;;
+  smart-vanity-deploy-test)
+    root=/opt/smart-vanity-test
+    service=smart-vanity-api-test.service
+    port=3001
+    public_health=https://smartvanity.filinda.ru/test/api/health
+    public_status=401
+    ;;
+  *) echo 'Unknown deployment entry point' >&2; exit 1 ;;
+esac
 
 exec 9>"$root/deploy.lock"
 flock -x 9
@@ -47,19 +61,23 @@ trap 'exit 143' TERM HUP
 
 tar -xzf - -C "$release"
 cd "$release"
+if [[ $service == smart-vanity-api-test.service && ! -s client/index.html ]]; then
+  echo 'The test release is missing the browser build' >&2
+  exit 1
+fi
 npm ci --omit=dev --workspace server --include-workspace-root=false --no-audit --no-fund
 
 activated=true
 point_current "$release"
 sudo -n /usr/bin/systemctl restart "$service"
 
-healthy() {
+responds_with() {
   [[ $(curl --silent --show-error --max-time 5 --output /dev/null --write-out '%{http_code}' \
-    "$1") == 200 ]]
+    "$1") == "$2" ]]
 }
 
 for attempt in {1..10}; do
-  if healthy http://127.0.0.1:3000/api/health && healthy "$public_health"; then
+  if responds_with "http://127.0.0.1:$port/api/health" 200 && responds_with "$public_health" "$public_status"; then
     printf 'Deployed %s\n' "${release##*/}"
     exit 0
   fi

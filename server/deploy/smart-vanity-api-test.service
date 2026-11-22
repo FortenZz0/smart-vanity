@@ -1,0 +1,17 @@
+[Unit]
+Description=Smart Vanity API (test)
+After=network.target
+
+[Service]
+Type=exec
+User=smart-vanity-test
+Group=smart-vanity-test
+WorkingDirectory=/opt/smart-vanity-test/current/server
+Environment=NODE_ENV=production
+Environment=API_PORT=3001
+ExecStart=/usr/bin/env node src/index.js
+Restart=on-failure
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

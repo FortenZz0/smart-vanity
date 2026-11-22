@@ -1,0 +1,18 @@
+redir /test /test/ 308
+
+handle_path /test/* {
+	basicauth {
+		import /etc/caddy/smart-vanity-test.users
+	}
+
+	handle /api/* {
+		reverse_proxy 127.0.0.1:3001 {
+			header_up -Authorization
+		}
+	}
+
+	handle {
+		root * /opt/smart-vanity-test/current/client
+		file_server
+	}
+}
