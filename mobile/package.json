@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite --mode mobile",
-    "build": "vue-tsc --noEmit -p app/tsconfig.json && vite build --mode mobile",
+    "dev:demo": "vite --mode demo",
+    "build": "npm run typecheck && vite build --mode mobile",
+    "build:demo": "npm run typecheck && vite build --mode demo",
+    "typecheck": "vue-tsc --noEmit -p app/tsconfig.json",
     "preview": "vite preview --mode mobile",
     "android:init": "npm run build && cap add android",
     "android:open": "cap sync android && cap open android"

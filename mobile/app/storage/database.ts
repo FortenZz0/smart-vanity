@@ -2,7 +2,8 @@ import { Capacitor } from '@capacitor/core'
 import { CapacitorSQLite, SQLiteConnection, type SQLiteDBConnection } from '@capacitor-community/sqlite'
 import { migrations } from './migrations'
 
-const databaseName = 'smart-vanity'
+const isDemo = import.meta.env.MODE === 'demo'
+const databaseName = isDemo ? 'smart-vanity-demo' : 'smart-vanity'
 const databaseVersion = migrations[migrations.length - 1].toVersion
 const sqlite = new SQLiteConnection(CapacitorSQLite)
 const isWeb = Capacitor.getPlatform() === 'web'
@@ -19,7 +20,15 @@ async function openDatabase(): Promise<SQLiteDBConnection> {
     await sqlite.initWebStore()
   }
 
-  await sqlite.addUpgradeStatement(databaseName, migrations)
+  let upgrades = migrations
+  if (isDemo) {
+    const { demoProducts } = await import('./demoProducts')
+    upgrades = migrations.map((migration) => migration.toVersion === 1
+      ? { ...migration, statements: [...migration.statements, demoProducts] }
+      : migration)
+  }
+
+  await sqlite.addUpgradeStatement(databaseName, upgrades)
   const db = await sqlite.createConnection(databaseName, false, 'no-encryption', databaseVersion, false)
   try {
     await db.open()

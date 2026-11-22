@@ -10,7 +10,9 @@
     "web-preview": "vite preview --mode web",
     
     "mobile:dev": "npm run dev --workspace mobile --",
+    "mobile:dev:demo": "npm run dev:demo --workspace mobile --",
     "mobile:build": "npm run build --workspace mobile --",
+    "mobile:build:demo": "npm run build:demo --workspace mobile --",
     "mobile:preview": "npm run preview --workspace mobile --",
     "android:init": "npm run android:init --workspace mobile --",
     "android:open": "npm run android:open --workspace mobile --"

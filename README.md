@@ -50,3 +50,9 @@ npm run mobile:preview
 ```bash
 npm run android:open
 ```
+
+#### Запуск с примерами товаров
+
+`npm run mobile:dev:demo` запускает мобильное приложение в браузере с отдельной SQLite-базой. При её первом открытии добавляются 20 товаров без фото, в том числе архивные. Сроки рассчитываются относительно даты первого запуска.
+
+Для Android выполните `npm run mobile:build:demo`, затем `npm run android:open`. Обычная и демо-сборка используют `mobile/dist`. Чтобы вернуть обычную сборку, выполните `npm run mobile:build` перед `npm run android:open`.
