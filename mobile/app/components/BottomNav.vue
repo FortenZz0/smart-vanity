@@ -32,9 +32,6 @@ const items = [
 
 <style scoped>
 .bottom-nav {
-  position: sticky;
-  bottom: 0;
-  z-index: 1;
   padding: 0.5rem;
   padding-right: max(0.5rem, env(safe-area-inset-right));
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));

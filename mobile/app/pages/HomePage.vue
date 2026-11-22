@@ -97,6 +97,7 @@ onMounted(loadProducts)
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
+  padding-block-end: 4.25rem;
 }
 
 .home h2 {

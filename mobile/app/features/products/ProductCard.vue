@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 import { locale, translate } from '../../locales'
 import type { ProductExpiry } from './expiry'
 import type { Product } from './product'
@@ -54,24 +55,38 @@ const expiryLabel = computed(() => {
 </script>
 
 <template>
-  <article class="product-card" :class="`product-card--${layout}`">
-    <div class="product-card__photo">
-      <img v-if="photoUrl" :src="photoUrl" alt="" loading="lazy" @error="photoUrl = null">
-      <span v-else>{{ translate('noProductPhoto') }}</span>
-    </div>
-    <div class="product-card__body">
-      <h3 :title="product.name">{{ product.name }}</h3>
-      <span
-        class="product-card__expiry"
-        :class="{ 'product-card__expiry--warning': product.archivedAt === null && (expiringSoon || expiry.status === 'expired') }"
-      >
-        {{ expiryLabel }}
-      </span>
-    </div>
-  </article>
+  <RouterLink
+    class="product-card-link"
+    :to="{ name: 'edit-product', params: { productId: product.id } }"
+    :aria-label="product.name"
+  >
+    <article class="product-card" :class="`product-card--${layout}`">
+      <div class="product-card__photo">
+        <img v-if="photoUrl" :src="photoUrl" alt="" loading="lazy" @error="photoUrl = null">
+        <span v-else>{{ translate('noProductPhoto') }}</span>
+      </div>
+      <div class="product-card__body">
+        <h3 :title="product.name">{{ product.name }}</h3>
+        <span
+          class="product-card__expiry"
+          :class="{ 'product-card__expiry--warning': product.archivedAt === null && (expiringSoon || expiry.status === 'expired') }"
+        >
+          {{ expiryLabel }}
+        </span>
+      </div>
+    </article>
+  </RouterLink>
 </template>
 
 <style scoped>
+.product-card-link {
+  display: block;
+  block-size: 100%;
+  border-radius: 0.875rem;
+  color: inherit;
+  text-decoration: none;
+}
+
 .product-card {
   display: grid;
   gap: 0.75rem;
