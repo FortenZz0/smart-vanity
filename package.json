@@ -3,7 +3,7 @@
   "private": false,
   "version": "0.0.0",
   "type": "module",
-  "workspaces": ["mobile"],
+  "workspaces": ["mobile", "server"],
   "scripts": {
     "web-dev": "vite --mode web",
     "web-build": "vite build --mode web",
@@ -16,7 +16,10 @@
     "mobile:preview": "npm run preview --workspace mobile --",
     "android:init": "npm run android:init --workspace mobile --",
     "android:open": "npm run android:open --workspace mobile --",
-    "anrodi:sync": "npm run android:sync -- workspace mobile --"
+    "android:sync": "npm run android:sync -- workspace mobile --",
+  
+    "server:deploy": "npm run deploy --workspace server --",
+    "server:start": "npm run start --workspace server --"
   },
   "devDependencies": {
     "glob": "^13.0.6",
