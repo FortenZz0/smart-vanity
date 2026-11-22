@@ -2,6 +2,8 @@
   "home": "Главная",
   "explore": "Обзор",
   "profile": "Профиль",
+  "profileName": "Ваше имя",
+  "profileGuestName": "Гость",
   "navigation": "Разделы приложения",
   "settings": "Настройки",
   "language": "Язык",

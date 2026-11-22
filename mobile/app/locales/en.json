@@ -2,6 +2,8 @@
   "home": "Home",
   "explore": "Explore",
   "profile": "Profile",
+  "profileName": "Your name",
+  "profileGuestName": "Guest",
   "navigation": "App sections",
   "settings": "Settings",
   "language": "Language",
