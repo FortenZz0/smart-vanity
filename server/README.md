@@ -2,6 +2,8 @@
 
 Нужен Node.js 22 или новее. Из корня репозитория установите зависимости командой `npm ci`. Затем из `server/` запустите `npm start`. `GET http://127.0.0.1:3000/api/health` возвращает `200 OK` и `{"status":"ok"}`.
 
+Для совместного запуска с клиентом в браузере скопируйте корневой `.env.example` в `.env` и запустите из корня `npm run server:start` и `npm run mobile:dev` в разных терминалах. Fastify слушает порт `API_PORT` из `.env`, а Vite направляет `/api/*` на тот же порт. Ответ API можно проверить по адресу `http://localhost:8082/api/health`. После изменения `API_PORT` перезапустите оба процесса.
+
 ## Выкладка
 
 Из `server/` запустите `npm run deploy`. В Windows PowerShell с ограничением на скрипты используйте `npm.cmd run deploy`. Нужны `tar`, OpenSSH, доступ к `deploy@quiz.filinda.ru` через SSH и проверенный ключ хоста в `known_hosts`.
