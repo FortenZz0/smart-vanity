@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { translate } from '../locales'
+</script>
+
 <template>
-  <h1>Обзор</h1>
+  <h1>{{ translate('explore') }}</h1>
 </template>

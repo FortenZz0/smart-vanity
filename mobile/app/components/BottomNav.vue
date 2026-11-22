@@ -2,23 +2,24 @@
 import exploreIcon from '../../assets/icons/explore.svg'
 import homeIcon from '../../assets/icons/home.svg'
 import profileIcon from '../../assets/icons/person.svg'
+import { translate } from '../locales'
 import BottomNavItem from './BottomNavItem.vue'
 
 const items = [
-  { name: 'home', label: 'Главная', iconUrl: homeIcon },
-  { name: 'explore', label: 'Обзор', iconUrl: exploreIcon },
-  { name: 'profile', label: 'Профиль', iconUrl: profileIcon },
-]
+  { name: 'home', iconUrl: homeIcon },
+  { name: 'explore', iconUrl: exploreIcon },
+  { name: 'profile', iconUrl: profileIcon },
+] as const
 </script>
 
 <template>
-  <nav class="bottom-nav" aria-label="Разделы приложения">
+  <nav class="bottom-nav" :aria-label="translate('navigation')">
     <div class="bottom-nav__items">
       <BottomNavItem
         v-for="item in items"
         :key="item.name"
         :name="item.name"
-        :label="item.label"
+        :label="translate(item.name)"
         :icon-url="item.iconUrl"
       />
     </div>
