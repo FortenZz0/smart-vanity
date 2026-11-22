@@ -26,11 +26,11 @@ body {
 }
 
 .screen {
-  display: grid;
-  padding: 1rem;
-  padding-top: max(1rem, env(safe-area-inset-top));
-  place-items: center;
-  text-align: center;
+  padding:
+    calc(1rem + env(safe-area-inset-top, 0px))
+    calc(1rem + env(safe-area-inset-right, 0px))
+    1rem
+    calc(1rem + env(safe-area-inset-left, 0px));
 }
 
 .screen h1 {
