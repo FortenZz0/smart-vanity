@@ -22,5 +22,13 @@ export default defineConfig({
   build: {
     outDir: '../dist',
     emptyOutDir: true,
+    rolldownOptions: {
+      output: {
+        // jeep-sqlite запрашивает WebAssembly-файл по этому имени.
+        assetFileNames: ({ names }) => names.includes('sql-wasm.wasm')
+          ? 'assets/sql-wasm.wasm'
+          : 'assets/[name]-[hash][extname]',
+      },
+    },
   },
 })

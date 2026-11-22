@@ -1,0 +1,34 @@
+import type { capSQLiteVersionUpgrade } from '@capacitor-community/sqlite'
+
+export const migrations: capSQLiteVersionUpgrade[] = [
+  {
+    toVersion: 1,
+    statements: [
+      `CREATE TABLE products (
+        id TEXT PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL CHECK (length(trim(name)) > 0),
+        note TEXT NOT NULL,
+        photo_id TEXT,
+        opened_on TEXT,
+        pao_months INTEGER CHECK (pao_months IS NULL OR (typeof(pao_months) = 'integer' AND pao_months > 0)),
+        expiry_kind TEXT,
+        expires_on TEXT,
+        manufactured_on TEXT,
+        shelf_duration INTEGER,
+        shelf_unit TEXT,
+        archived_at TEXT,
+        CHECK (
+          (expiry_kind IS NULL AND expires_on IS NULL AND manufactured_on IS NULL AND shelf_duration IS NULL AND shelf_unit IS NULL)
+          OR (expiry_kind IS 'date' AND expires_on IS NOT NULL AND manufactured_on IS NULL AND shelf_duration IS NULL AND shelf_unit IS NULL)
+          OR (expiry_kind IS 'shelfLife' AND expires_on IS NULL AND manufactured_on IS NOT NULL
+              AND typeof(shelf_duration) = 'integer' AND shelf_duration > 0
+              AND shelf_unit IS NOT NULL AND shelf_unit IN ('days', 'months', 'years'))
+        )
+      );`,
+      `CREATE TABLE product_photos (
+        id TEXT PRIMARY KEY NOT NULL,
+        mime_type TEXT NOT NULL
+      );`,
+    ],
+  },
+]
