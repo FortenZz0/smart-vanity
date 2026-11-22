@@ -8,5 +8,20 @@
   "theme": "Theme",
   "themeLight": "Light",
   "themeDark": "Dark",
-  "themeSystem": "System"
+  "themeSystem": "System",
+  "expiringSoon": "Expiring soon",
+  "myProducts": "My cosmetics",
+  "productArchive": "Archive",
+  "noExpiringProducts": "No products expiring soon",
+  "noActiveProducts": "No products yet",
+  "noArchivedProducts": "The archive is empty",
+  "productsLoading": "Loading cosmetics…",
+  "productsLoadError": "Could not load cosmetics",
+  "tryAgain": "Try again",
+  "noProductPhoto": "No photo",
+  "expiryUnknown": "No expiry date",
+  "expiryExpired": "Expired",
+  "expiryToday": "Expires today",
+  "expiryRemainingOne": "{time} left",
+  "expiryRemaining": "{time} left"
 }

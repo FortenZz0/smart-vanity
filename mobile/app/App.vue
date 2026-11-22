@@ -26,6 +26,7 @@ body {
 }
 
 .screen {
+  min-inline-size: 0;
   padding:
     calc(1rem + env(safe-area-inset-top, 0px))
     calc(1rem + env(safe-area-inset-right, 0px))

@@ -8,5 +8,20 @@
   "theme": "Тема",
   "themeLight": "Светлая",
   "themeDark": "Тёмная",
-  "themeSystem": "Системная"
+  "themeSystem": "Системная",
+  "expiringSoon": "Скоро закончится",
+  "myProducts": "Моя косметика",
+  "productArchive": "Архив",
+  "noExpiringProducts": "Пока нет продуктов с истекающим сроком",
+  "noActiveProducts": "Здесь пока нет продуктов",
+  "noArchivedProducts": "Архив пока пуст",
+  "productsLoading": "Загружаем косметику…",
+  "productsLoadError": "Не удалось загрузить косметику",
+  "tryAgain": "Повторить",
+  "noProductPhoto": "Нет фото",
+  "expiryUnknown": "Срок не указан",
+  "expiryExpired": "Срок истёк",
+  "expiryToday": "Истекает сегодня",
+  "expiryRemainingOne": "Остался {time}",
+  "expiryRemaining": "Осталось {time}"
 }

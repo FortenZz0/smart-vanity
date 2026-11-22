@@ -8,6 +8,9 @@
   --color-accent: #853846;
   --color-on-accent: #ffffff;
   --color-selected-bg: #e49fad;
+  --color-photo-placeholder: #eeebea;
+  --color-expiry-warning-bg: #fbe4da;
+  --color-expiry-warning-text: #84351f;
 
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -23,6 +26,9 @@
   --color-accent: #e9a9b7;
   --color-on-accent: #2d2024;
   --color-selected-bg: #5a333e;
+  --color-photo-placeholder: #403a3b;
+  --color-expiry-warning-bg: #65372c;
+  --color-expiry-warning-text: #ffd6c7;
 }
 
 a {
