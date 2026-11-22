@@ -28,21 +28,16 @@ defineProps<{
   justify-content: center;
   gap: 0.125rem;
   border-radius: 0.5rem;
-  color: #52525b;
+  color: var(--color-text-muted);
   font-size: 0.75rem;
   line-height: 1.25;
   text-decoration: none;
 }
 
 .bottom-nav__link[aria-current='page'] {
-  background: #f0f0f2;
-  color: #18181b;
+  background: var(--color-selected-bg);
+  color: var(--color-text);
   font-weight: 600;
-}
-
-.bottom-nav__link:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
 }
 
 .bottom-nav__icon {

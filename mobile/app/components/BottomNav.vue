@@ -35,8 +35,8 @@ const items = [
   padding-right: max(0.5rem, env(safe-area-inset-right));
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   padding-left: max(0.5rem, env(safe-area-inset-left));
-  border-top: 1px solid #e5e7eb;
-  background: #fff;
+  border-top: 1px solid var(--color-divider);
+  background: var(--color-surface);
 }
 
 .bottom-nav__items {

@@ -1,0 +1,29 @@
+:root {
+  color-scheme: light;
+  --color-bg: #fbf2eb;
+  --color-surface: #ffffff;
+  --color-text: #2d2024;
+  --color-text-muted: #6d555d;
+  --color-divider: #e5d5cc;
+  --color-accent: #853846;
+  --color-on-accent: #ffffff;
+  --color-selected-bg: #e49fad;
+
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-accent);
+}
+
+select {
+  border-color: var(--color-text-muted);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
