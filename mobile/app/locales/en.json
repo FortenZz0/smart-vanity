@@ -4,5 +4,8 @@
   "profile": "Profile",
   "navigation": "App sections",
   "settings": "Settings",
-  "language": "Language"
+  "language": "Language",
+  "theme": "Theme",
+  "themeLight": "Light",
+  "themeDark": "Dark"
 }

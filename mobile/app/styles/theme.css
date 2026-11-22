@@ -13,6 +13,18 @@
   color: var(--color-text);
 }
 
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: #21191c;
+  --color-surface: #2c2125;
+  --color-text: #f8edef;
+  --color-text-muted: #c4aeb5;
+  --color-divider: #49373e;
+  --color-accent: #e9a9b7;
+  --color-on-accent: #2d2024;
+  --color-selected-bg: #5a333e;
+}
+
 a {
   color: var(--color-accent);
 }

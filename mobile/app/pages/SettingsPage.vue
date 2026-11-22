@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { languages, locale, translate } from '../locales'
+import { theme, themes } from '../theme'
 </script>
 
 <template>
@@ -10,6 +11,14 @@ import { languages, locale, translate } from '../locales'
       <select id="app-language" v-model="locale">
         <option v-for="language in languages" :key="language.code" :value="language.code">
           {{ language.label }}
+        </option>
+      </select>
+    </p>
+    <p>
+      <label for="app-theme">{{ translate('theme') }}</label>
+      <select id="app-theme" v-model="theme">
+        <option v-for="option in themes" :key="option.value" :value="option.value">
+          {{ translate(option.label) }}
         </option>
       </select>
     </p>

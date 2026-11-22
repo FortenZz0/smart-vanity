@@ -4,5 +4,8 @@
   "profile": "Профиль",
   "navigation": "Разделы приложения",
   "settings": "Настройки",
-  "language": "Язык"
+  "language": "Язык",
+  "theme": "Тема",
+  "themeLight": "Светлая",
+  "themeDark": "Тёмная"
 }
