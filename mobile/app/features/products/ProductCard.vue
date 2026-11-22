@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import archiveIcon from '../../../assets/icons/archive.svg'
+import openIcon from '../../../assets/icons/lock_open.svg'
+import restoreIcon from '../../../assets/icons/unarchive.svg'
 import { locale, translate } from '../../locales'
 import type { ProductExpiry } from './expiry'
 import type { Product } from './product'
@@ -11,7 +14,23 @@ const props = defineProps<{
   expiry: ProductExpiry
   expiringSoon: boolean
   layout: 'row' | 'tile'
+  actionPending?: boolean
 }>()
+
+const actions = {
+  open: { icon: openIcon, label: 'openProduct' },
+  archive: { icon: archiveIcon, label: 'archiveProduct' },
+  restore: { icon: restoreIcon, label: 'restoreProduct' },
+} as const
+
+defineEmits<{ quickAction: [action: keyof typeof actions] }>()
+
+const quickAction = computed(() => {
+  if (props.product.archivedAt !== null) return 'restore'
+  return props.layout === 'row' && props.product.openedOn === null ? 'open' : 'archive'
+})
+const actionIcon = computed(() => actions[quickAction.value].icon)
+const actionLabel = computed(() => translate(actions[quickAction.value].label))
 
 const photoUrl = ref<string | null>(null)
 
@@ -55,39 +74,59 @@ const expiryLabel = computed(() => {
 </script>
 
 <template>
-  <RouterLink
-    class="product-card-link"
-    :to="{ name: 'edit-product', params: { productId: product.id } }"
-    :aria-label="product.name"
-  >
-    <article class="product-card" :class="`product-card--${layout}`">
-      <div class="product-card__photo">
-        <img v-if="photoUrl" :src="photoUrl" alt="" loading="lazy" @error="photoUrl = null">
-        <span v-else>{{ translate('noProductPhoto') }}</span>
-      </div>
-      <div class="product-card__body">
-        <h3 :title="product.name">{{ product.name }}</h3>
-        <span
-          class="product-card__expiry"
-          :class="{ 'product-card__expiry--warning': product.archivedAt === null && (expiringSoon || expiry.status === 'expired') }"
-        >
-          {{ expiryLabel }}
-        </span>
-      </div>
-    </article>
-  </RouterLink>
+  <article class="product-card" :class="`product-card--${layout}`">
+    <div class="product-card__photo">
+      <img v-if="photoUrl" :src="photoUrl" alt="" loading="lazy" @error="photoUrl = null">
+      <span v-else>{{ translate('noProductPhoto') }}</span>
+    </div>
+    <div class="product-card__body">
+      <h3 :title="product.name">
+        <RouterLink class="product-card-link" :to="{ name: 'edit-product', params: { productId: product.id } }">
+          {{ product.name }}
+        </RouterLink>
+      </h3>
+      <span
+        class="product-card__expiry"
+        :class="{ 'product-card__expiry--warning': product.archivedAt === null && (expiringSoon || expiry.status === 'expired') }"
+      >
+        {{ expiryLabel }}
+      </span>
+    </div>
+    <button
+      v-if="layout === 'row' || product.archivedAt === null"
+      class="product-card__action"
+      type="button"
+      :aria-label="actionLabel"
+      :title="actionLabel"
+      :disabled="actionPending"
+      @click="$emit('quickAction', quickAction)"
+    >
+      <span :style="{ maskImage: `url(${JSON.stringify(actionIcon)})` }" aria-hidden="true"></span>
+    </button>
+  </article>
 </template>
 
 <style scoped>
 .product-card-link {
-  display: block;
-  block-size: 100%;
-  border-radius: 0.875rem;
   color: inherit;
   text-decoration: none;
 }
 
+.product-card-link::after {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.875rem;
+  content: '';
+}
+
+.product-card-link:focus-visible::after {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .product-card {
+  position: relative;
+  isolation: isolate;
   display: grid;
   gap: 0.75rem;
   padding: 0.625rem;
@@ -97,14 +136,61 @@ const expiryLabel = computed(() => {
 }
 
 .product-card--row {
-  grid-template-columns: 4rem minmax(0, 1fr);
+  grid-template-columns: 4rem minmax(0, 1fr) 3.75rem;
   align-items: center;
 }
 
 .product-card--tile {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  column-gap: 0;
   box-sizing: border-box;
   block-size: 100%;
+}
+
+.product-card__action {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-self: stretch;
+  justify-self: stretch;
+  min-inline-size: 0;
+  min-block-size: 2.75rem;
+  margin: 0.125rem;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.product-card--row .product-card__action {
+  grid-column: 3;
+}
+
+.product-card--tile .product-card__action {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.product-card__action:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.product-card__action span {
+  inline-size: min(80%, 2.5rem);
+  aspect-ratio: 1;
+  background: currentColor;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.product-card--row .product-card__action span {
+  inline-size: min(80%, 3rem);
 }
 
 .product-card__photo {
@@ -119,6 +205,7 @@ const expiryLabel = computed(() => {
 }
 
 .product-card--tile .product-card__photo {
+  grid-column: 1 / -1;
   aspect-ratio: 4 / 3;
 }
 
@@ -132,6 +219,7 @@ const expiryLabel = computed(() => {
 
 .product-card__body {
   min-inline-size: 0;
+  container-type: inline-size;
 }
 
 .product-card__body h3 {
@@ -144,12 +232,19 @@ const expiryLabel = computed(() => {
 
 .product-card__expiry {
   display: inline-block;
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  overflow: hidden;
   padding: 0.25rem 0.5rem;
+  padding-inline: min(0.5rem, 5cqi);
   border-radius: 0.375rem;
   background: var(--color-bg);
   color: var(--color-text-muted);
   font-size: 0.75rem;
+  font-size: min(0.75rem, 9.5cqi);
   font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .product-card__expiry--warning {

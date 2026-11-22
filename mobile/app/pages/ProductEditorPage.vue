@@ -159,7 +159,7 @@ async function discardPhoto(id: string) {
   })
 }
 
-async function submitProduct() {
+async function submitProduct(event: SubmitEvent) {
   if (loadState.value !== 'ready' || !name.value || saving.value || photoLoading.value) return
 
   const expiry = checkedExpiry.value
@@ -168,6 +168,10 @@ async function submitProduct() {
 
   const submittedFrom = router.currentRoute.value
   const original = originalProduct.value
+  const action = event.submitter?.getAttribute('value')
+  let archivedAt = original?.archivedAt ?? null
+  if (original && action === 'archive' && archivedAt === null) archivedAt = new Date().toISOString()
+  if (action === 'restore') archivedAt = null
   saving.value = true
   saveFailed.value = false
   let addedPhoto: string | null = null
@@ -182,7 +186,7 @@ async function submitProduct() {
       note: note.value,
       photoId,
       ...expiry.fields,
-      archivedAt: original?.archivedAt ?? null,
+      archivedAt,
     })
     if (original?.photoId && original.photoId !== photoId) await discardPhoto(original.photoId)
     if (router.currentRoute.value === submittedFrom) {
@@ -303,6 +307,15 @@ async function submitProduct() {
 
         <div class="product-form__actions">
           <button type="submit" :disabled="!name || saving || photoLoading">{{ translate('saveProduct') }}</button>
+          <button
+            v-if="originalProduct"
+            class="product-form__archive"
+            type="submit"
+            :value="originalProduct.archivedAt === null ? 'archive' : 'restore'"
+            :disabled="!name || saving || photoLoading"
+          >
+            {{ translate(originalProduct.archivedAt === null ? 'archiveProduct' : 'restoreProduct') }}
+          </button>
           <RouterLink :to="{ name: 'home' }" replace>{{ translate('cancel') }}</RouterLink>
         </div>
         <p v-if="saveFailed" role="alert">{{ translate('productSaveError') }}</p>
@@ -466,6 +479,12 @@ async function submitProduct() {
 
 .product-form__actions button:disabled {
   opacity: 0.55;
+}
+
+.product-form__actions .product-form__archive {
+  border: 1px solid var(--color-divider);
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .product-form p {

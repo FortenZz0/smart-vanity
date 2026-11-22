@@ -1,4 +1,5 @@
 import { queryDatabase, writeDatabase } from '../../storage/database'
+import { getLocalToday } from './expiry'
 import type { CalendarDate, ExpiryInput, Product, ShelfLifeUnit } from './product'
 
 type ProductRow = {
@@ -48,6 +49,24 @@ export async function listProducts(): Promise<Product[]> {
 export async function getProduct(id: string): Promise<Product | null> {
   const [row] = await queryDatabase<ProductRow>('SELECT * FROM products WHERE id = ?', [id])
   return row ? toProduct(row) : null
+}
+
+export function markProductOpened(id: string): Promise<void> {
+  return writeDatabase(
+    'UPDATE products SET opened_on = ? WHERE id = ? AND opened_on IS NULL AND archived_at IS NULL',
+    [getLocalToday(), id],
+  )
+}
+
+export function archiveProduct(id: string): Promise<void> {
+  return writeDatabase(
+    'UPDATE products SET archived_at = ? WHERE id = ? AND archived_at IS NULL',
+    [new Date().toISOString(), id],
+  )
+}
+
+export function restoreProduct(id: string): Promise<void> {
+  return writeDatabase('UPDATE products SET archived_at = NULL WHERE id = ? AND archived_at IS NOT NULL', [id])
 }
 
 export function saveProduct(product: Product): Promise<void> {

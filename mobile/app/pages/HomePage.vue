@@ -3,13 +3,16 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import ProductCard from '../features/products/ProductCard.vue'
 import { getProductExpiry } from '../features/products/expiry'
 import type { Product } from '../features/products/product'
-import { listProducts } from '../features/products/productRepository'
+import { archiveProduct, getProduct, listProducts, markProductOpened, restoreProduct } from '../features/products/productRepository'
 import { translate } from '../locales'
 
 const soonThresholdDays = 30
 const products = ref<Product[]>([])
 const loadState = ref<'loading' | 'ready' | 'error'>('loading')
 const openSections = reactive({ active: true, archived: false })
+const pendingActions = reactive(new Set<string>())
+const actionFailed = ref(false)
+const productActions = { open: markProductOpened, archive: archiveProduct, restore: restoreProduct }
 
 const cards = computed(() => products.value.map((product) => {
   const expiry = getProductExpiry(product)
@@ -44,6 +47,25 @@ async function loadProducts() {
 }
 
 onMounted(loadProducts)
+
+async function runProductAction(product: Product, action: keyof typeof productActions) {
+  const { id } = product
+  if (pendingActions.has(id)) return
+
+  pendingActions.add(id)
+  actionFailed.value = false
+  try {
+    await productActions[action](id)
+    const updated = await getProduct(id)
+    const index = products.value.findIndex((item) => item.id === id)
+    if (updated && index !== -1) products.value[index] = updated
+  } catch (error) {
+    console.error('Failed to update the local product', error)
+    actionFailed.value = true
+  } finally {
+    pendingActions.delete(id)
+  }
+}
 </script>
 
 <template>
@@ -58,11 +80,21 @@ onMounted(loadProducts)
       <button type="button" @click="loadProducts">{{ translate('tryAgain') }}</button>
     </div>
     <template v-else>
+      <p v-if="actionFailed" class="home__status" role="alert">
+        {{ translate('productSaveError') }}
+      </p>
       <section v-if="expiringSoon.length" aria-labelledby="expiring-soon-heading">
         <h2 id="expiring-soon-heading">{{ translate('expiringSoon') }}</h2>
         <ul class="home__list home__list--horizontal" tabindex="0">
           <li v-for="card in expiringSoon" :key="card.product.id">
-            <ProductCard :product="card.product" :expiry="card.expiry" expiring-soon layout="tile" />
+            <ProductCard
+              :product="card.product"
+              :expiry="card.expiry"
+              :action-pending="pendingActions.has(card.product.id)"
+              expiring-soon
+              layout="tile"
+              @quick-action="runProductAction(card.product, $event)"
+            />
           </li>
         </ul>
       </section>
@@ -81,7 +113,9 @@ onMounted(loadProducts)
                 :product="card.product"
                 :expiry="card.expiry"
                 :expiring-soon="card.expiringSoon"
+                :action-pending="pendingActions.has(card.product.id)"
                 layout="row"
+                @quick-action="runProductAction(card.product, $event)"
               />
             </li>
           </ul>

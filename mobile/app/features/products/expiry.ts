@@ -33,7 +33,7 @@ function formatCalendarDate(date: Date): CalendarDate {
   return date.toISOString().slice(0, 10) as CalendarDate
 }
 
-function getLocalToday(): CalendarDate {
+export function getLocalToday(): CalendarDate {
   const now = new Date()
   const today = new Date(0)
   today.setUTCFullYear(now.getFullYear(), now.getMonth(), now.getDate())
