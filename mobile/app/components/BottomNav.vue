@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import exploreIcon from '../../assets/icons/explore.svg'
 import homeIcon from '../../assets/icons/home.svg'
 import profileIcon from '../../assets/icons/person.svg'
 import { translate } from '../locales'
 import BottomNavItem from './BottomNavItem.vue'
+
+const route = useRoute()
 
 const items = [
   { name: 'home', iconUrl: homeIcon },
@@ -21,6 +24,7 @@ const items = [
         :name="item.name"
         :label="translate(item.name)"
         :icon-url="item.iconUrl"
+        :active="item.name === (route.meta.navSection ?? route.name)"
       />
     </div>
   </nav>

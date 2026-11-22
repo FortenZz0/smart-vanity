@@ -10,7 +10,12 @@ export const router = createRouter({
     { path: '/', name: 'home', component: HomePage },
     { path: '/explore', name: 'explore', component: ExplorePage },
     { path: '/profile', name: 'profile', component: ProfilePage },
-    { path: '/profile/settings', name: 'settings', component: SettingsPage },
+    {
+      path: '/profile/settings',
+      name: 'settings',
+      component: SettingsPage,
+      meta: { navSection: 'profile' },
+    },
     { path: '/:pathMatch(.*)*', redirect: { name: 'home' } },
   ],
 })

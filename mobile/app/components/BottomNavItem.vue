@@ -5,11 +5,16 @@ defineProps<{
   name: string // имя экрана
   label: string
   iconUrl: string
+  active: boolean
 }>()
 </script>
 
 <template>
-  <RouterLink :to="{ name }" class="bottom-nav__link">
+  <RouterLink
+    :to="{ name }"
+    class="bottom-nav__link"
+    :class="{ 'bottom-nav__link--active': active }"
+  >
     <span
       class="bottom-nav__icon"
       :style="{ '--icon': `url(${JSON.stringify(iconUrl)})` }"
@@ -34,7 +39,7 @@ defineProps<{
   text-decoration: none;
 }
 
-.bottom-nav__link[aria-current='page'] {
+.bottom-nav__link--active {
   background: var(--color-selected-bg);
   color: var(--color-text);
   font-weight: 600;
