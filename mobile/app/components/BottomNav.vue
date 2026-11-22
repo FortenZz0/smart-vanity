@@ -1,25 +1,26 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
+import exploreIcon from '../../assets/icons/explore.svg'
+import homeIcon from '../../assets/icons/home.svg'
+import profileIcon from '../../assets/icons/person.svg'
+import BottomNavItem from './BottomNavItem.vue'
 
 const items = [
-  { name: 'home', label: 'Главная' },
-  { name: 'explore', label: 'Обзор' },
-  { name: 'profile', label: 'Профиль' },
+  { name: 'home', label: 'Главная', iconUrl: homeIcon },
+  { name: 'explore', label: 'Обзор', iconUrl: exploreIcon },
+  { name: 'profile', label: 'Профиль', iconUrl: profileIcon },
 ]
 </script>
 
 <template>
   <nav class="bottom-nav" aria-label="Разделы приложения">
     <div class="bottom-nav__items">
-      <RouterLink
+      <BottomNavItem
         v-for="item in items"
         :key="item.name"
-        :to="{ name: item.name }"
-        class="bottom-nav__link"
-      >
-        <span class="bottom-nav__icon" :data-icon="item.name" aria-hidden="true"></span>
-        {{ item.label }}
-      </RouterLink>
+        :name="item.name"
+        :label="item.label"
+        :icon-url="item.iconUrl"
+      />
     </div>
   </nav>
 </template>
@@ -43,49 +44,5 @@ const items = [
   gap: 0.25rem;
   max-width: 30rem;
   margin-inline: auto;
-}
-
-.bottom-nav__link {
-  display: flex;
-  min-height: 3rem;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.125rem;
-  border-radius: 0.5rem;
-  color: #52525b;
-  font-size: 0.75rem;
-  line-height: 1.25;
-  text-decoration: none;
-}
-
-.bottom-nav__link[aria-current='page'] {
-  background: #f0f0f2;
-  color: #18181b;
-  font-weight: 600;
-}
-
-.bottom-nav__link:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
-
-.bottom-nav__icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  background-color: currentColor;
-  mask: var(--icon) center / contain no-repeat;
-}
-
-[data-icon='home'] {
-  --icon: url('../../assets/icons/home.svg');
-}
-
-[data-icon='explore'] {
-  --icon: url('../../assets/icons/explore.svg');
-}
-
-[data-icon='profile'] {
-  --icon: url('../../assets/icons/person.svg');
 }
 </style>
