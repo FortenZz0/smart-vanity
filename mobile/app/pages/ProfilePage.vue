@@ -88,6 +88,12 @@ function finishEditing(event: KeyboardEvent) {
         ></span>
       </label>
     </div>
+    <div class="profile__auth">
+      <RouterLink :to="{ name: 'auth' }">{{ translate('authSignIn') }}</RouterLink>
+      <RouterLink :to="{ name: 'auth', query: { mode: 'register' } }">
+        {{ translate('authRegister') }}
+      </RouterLink>
+    </div>
     <p><RouterLink :to="{ name: 'settings' }">{{ translate('settings') }}</RouterLink></p>
   </section>
 </template>
@@ -192,5 +198,33 @@ function finishEditing(event: KeyboardEvent) {
 
 .profile__name--editing input {
   opacity: 1;
+}
+
+.profile__auth {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  max-inline-size: 28rem;
+  margin: 1rem auto 0;
+}
+
+.profile__auth a {
+  display: grid;
+  min-block-size: 2.75rem;
+  place-items: center;
+  padding: 0.25rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-accent);
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.profile__auth a:first-child {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
 </style>
