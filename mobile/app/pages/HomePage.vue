@@ -58,14 +58,13 @@ onMounted(loadProducts)
       <button type="button" @click="loadProducts">{{ translate('tryAgain') }}</button>
     </div>
     <template v-else>
-      <section aria-labelledby="expiring-soon-heading">
+      <section v-if="expiringSoon.length" aria-labelledby="expiring-soon-heading">
         <h2 id="expiring-soon-heading">{{ translate('expiringSoon') }}</h2>
-        <ul v-if="expiringSoon.length" class="home__list home__list--horizontal" tabindex="0">
+        <ul class="home__list home__list--horizontal" tabindex="0">
           <li v-for="card in expiringSoon" :key="card.product.id">
             <ProductCard :product="card.product" :expiry="card.expiry" expiring-soon layout="tile" />
           </li>
         </ul>
-        <p v-else class="home__status">{{ translate('noExpiringProducts') }}</p>
       </section>
 
       <details
