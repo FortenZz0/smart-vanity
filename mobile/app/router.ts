@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage.vue'
 import ProductEditorPage from './pages/ProductEditorPage.vue'
 import ExplorePage from './pages/ExplorePage.vue'
 import ProfilePage from './pages/ProfilePage.vue'
+import RitualsPage from './pages/RitualsPage.vue'
 import SettingsPage from './pages/SettingsPage.vue'
 
 export const router = createRouter({
@@ -25,6 +26,12 @@ export const router = createRouter({
     },
     { path: '/explore', name: 'explore', component: ExplorePage },
     { path: '/profile', name: 'profile', component: ProfilePage },
+    {
+      path: '/profile/rituals',
+      name: 'rituals',
+      component: RitualsPage,
+      meta: { navSection: 'profile' },
+    },
     {
       path: '/profile/settings',
       name: 'settings',
