@@ -1,1 +1,0 @@
-deploy ALL=(root) NOPASSWD: /usr/bin/systemctl restart smart-vanity-api-test.service, /usr/bin/systemctl stop smart-vanity-api-test.service

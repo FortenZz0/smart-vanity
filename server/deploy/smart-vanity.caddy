@@ -1,8 +1,0 @@
-smartvanity.filinda.ru {
-	handle /api/* {
-		reverse_proxy 127.0.0.1:3000
-	}
-	handle {
-		respond 404
-	}
-}
