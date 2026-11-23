@@ -20,10 +20,18 @@ const saveFailed = ref(false)
 let ritualId: string | undefined
 
 const weekdays: readonly Weekday[] = [1, 2, 3, 4, 5, 6, 7]
+const shortWeekdays = {
+  ru: ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'],
+  en: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+}
 const weekdayLabels = computed(() => {
   const formatter = new Intl.DateTimeFormat(locale.value, { weekday: 'long', timeZone: 'UTC' })
   // 1 января 2024 года — понедельник, как и первый день недели в модели.
-  return weekdays.map((day) => ({ day, label: formatter.format(Date.UTC(2024, 0, day)) }))
+  return weekdays.map((day) => ({
+    day,
+    label: formatter.format(Date.UTC(2024, 0, day)),
+    shortLabel: shortWeekdays[locale.value][day - 1],
+  }))
 })
 
 const validation = computed(() => {
@@ -122,9 +130,9 @@ async function submitRitual() {
         <fieldset v-else-if="scheduleKind === 'weekly'" :aria-describedby="errors.weekdays && 'ritual-weekdays-error'">
           <legend>{{ translate('ritualWeekdays') }}</legend>
           <div class="ritual-form__weekdays">
-            <label v-for="{ day, label } in weekdayLabels" :key="day">
-              <input v-model="selectedWeekdays" name="weekdays" type="checkbox" :value="day">
-              {{ label }}
+            <label v-for="{ day, label, shortLabel } in weekdayLabels" :key="day">
+              <input v-model="selectedWeekdays" name="weekdays" type="checkbox" :value="day" :aria-label="label">
+              <span aria-hidden="true">{{ shortLabel }}</span>
             </label>
           </div>
           <p v-if="errors.weekdays" id="ritual-weekdays-error" role="alert">{{ translate('ritualWeekdaysInvalid') }}</p>
@@ -208,7 +216,57 @@ async function submitRitual() {
   font: inherit;
 }
 
-.ritual-form__weekdays,
+.ritual-form__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(0.125rem, 1vw, 0.375rem);
+}
+
+.ritual-form__weekdays label {
+  position: relative;
+  display: grid;
+}
+
+.ritual-form__weekdays input {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+}
+
+.ritual-form__weekdays input:enabled {
+  cursor: pointer;
+}
+
+.ritual-form__weekdays span {
+  display: grid;
+  aspect-ratio: 1;
+  min-inline-size: 0;
+  place-items: center;
+  border: 1px solid var(--color-text-muted);
+  border-radius: 50%;
+  background: var(--color-surface);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.ritual-form__weekdays input:checked + span {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.ritual-form__weekdays input:focus-visible + span {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -4px;
+}
+
+.ritual-form__weekdays input:checked:focus-visible + span {
+  outline-color: var(--color-on-accent);
+}
+
 .ritual-form__reminder {
   display: flex;
   flex-wrap: wrap;
