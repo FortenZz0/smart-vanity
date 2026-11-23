@@ -9,6 +9,7 @@ const sqlite = new SQLiteConnection(CapacitorSQLite)
 const isWeb = Capacitor.getPlatform() === 'web'
 
 type SqlValue = string | number | null
+type SqlStatement = { statement: string; values: SqlValue[] }
 
 let connection: Promise<SQLiteDBConnection> | undefined
 let pendingWrites = Promise.resolve()
@@ -58,12 +59,20 @@ export async function queryDatabase<Row>(sql: string, values: SqlValue[] = []): 
   return (result.values ?? []) as Row[]
 }
 
-export function writeDatabase(sql: string, values: SqlValue[]): Promise<void> {
+function enqueueWrite(operation: (db: SQLiteDBConnection) => Promise<unknown>): Promise<void> {
   const write = pendingWrites.then(async () => {
     const db = await initializeDatabase()
-    await db.run(sql, values)
+    await operation(db)
     if (isWeb) await sqlite.saveToStore(databaseName)
   })
   pendingWrites = write.catch(() => {})
   return write
+}
+
+export function writeDatabase(sql: string, values: SqlValue[]): Promise<void> {
+  return enqueueWrite((db) => db.run(sql, values))
+}
+
+export function writeDatabaseTransaction(statements: SqlStatement[]): Promise<void> {
+  return enqueueWrite((db) => db.executeSet(statements, true))
 }

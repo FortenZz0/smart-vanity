@@ -31,4 +31,23 @@ export const migrations: capSQLiteVersionUpgrade[] = [
       );`,
     ],
   },
+  {
+    toVersion: 2,
+    statements: [
+      `CREATE TABLE rituals (
+        id TEXT PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL CHECK (length(trim(name)) > 0),
+        schedule TEXT NOT NULL
+      );`,
+      `CREATE TABLE ritual_reminders (
+        ritual_id TEXT NOT NULL REFERENCES rituals(id) ON DELETE CASCADE,
+        id TEXT NOT NULL,
+        time TEXT NOT NULL CHECK (
+          (time GLOB '[01][0-9]:[0-5][0-9]' OR time GLOB '2[0-3]:[0-5][0-9]')
+        ),
+        position INTEGER NOT NULL CHECK (position >= 0),
+        PRIMARY KEY (ritual_id, id)
+      );`,
+    ],
+  },
 ]
