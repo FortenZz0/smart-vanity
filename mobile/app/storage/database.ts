@@ -4,7 +4,6 @@ import { migrations } from './migrations'
 
 const isDemo = import.meta.env.MODE === 'demo'
 const databaseName = isDemo ? 'smart-vanity-demo' : 'smart-vanity'
-const databaseVersion = migrations[migrations.length - 1].toVersion
 const sqlite = new SQLiteConnection(CapacitorSQLite)
 const isWeb = Capacitor.getPlatform() === 'web'
 
@@ -24,11 +23,16 @@ async function openDatabase(): Promise<SQLiteDBConnection> {
   let upgrades = migrations
   if (isDemo) {
     const { demoProducts } = await import('./demoProducts')
-    upgrades = migrations.map((migration) => migration.toVersion === 1
-      ? { ...migration, statements: [...migration.statements, demoProducts] }
-      : migration)
+    const { demoRituals } = await import('./demoRituals')
+    upgrades = [
+      ...migrations.map((migration) => migration.toVersion === 1
+        ? { ...migration, statements: [...migration.statements, demoProducts] }
+        : migration),
+      { toVersion: 3, statements: demoRituals },
+    ]
   }
 
+  const databaseVersion = upgrades[upgrades.length - 1].toVersion
   await sqlite.addUpgradeStatement(databaseName, upgrades)
   const db = await sqlite.createConnection(databaseName, false, 'no-encryption', databaseVersion, false)
   try {
