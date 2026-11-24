@@ -23,5 +23,6 @@ export type Product = {
   openedOn: CalendarDate | null
   paoMonths: number | null
   expiry: ExpiryInput | null
+  finished: boolean
   archivedAt: string | null // Момент переноса в архив в ISO 8601 (UTC).
 }

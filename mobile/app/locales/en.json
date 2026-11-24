@@ -104,6 +104,7 @@
   "productNotFound": "Product not found",
   "productLoadError": "Could not load the product",
   "productName": "Product name",
+  "productFinished": "Used up",
   "productNote": "Note",
   "chooseProductPhoto": "Upload photo",
   "chooseProductIcon": "Choose icon",

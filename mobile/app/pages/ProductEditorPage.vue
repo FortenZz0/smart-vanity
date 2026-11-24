@@ -16,6 +16,7 @@ const originalProduct = shallowRef<Product | null>(null)
 const loadState = ref<'loading' | 'ready' | 'missing' | 'error'>(props.productId ? 'loading' : 'ready')
 const name = ref('')
 const note = ref('')
+const finished = ref(false)
 const openedOn = ref('')
 const paoMonths = ref<number | ''>('')
 const expiryMode = ref<ExpiryInput['kind']>('date')
@@ -51,6 +52,7 @@ async function loadProduct() {
     originalProduct.value = product
     name.value = product.name
     note.value = product.note
+    finished.value = product.finished
     openedOn.value = product.openedOn ?? ''
     paoMonths.value = product.paoMonths ?? ''
     storedPhotoId.value = product.photoId
@@ -229,6 +231,7 @@ async function submitProduct(event: SubmitEvent) {
       iconId: iconId.value,
       ...expiry.fields,
       archivedAt,
+      finished: finished.value,
     })
     if (original?.photoId && original.photoId !== photoId) await discardPhoto(original.photoId)
     if (router.currentRoute.value === submittedFrom) {
@@ -325,6 +328,10 @@ async function submitProduct(event: SubmitEvent) {
         <label class="product-form__field">
           <span>{{ translate('productNote') }}</span>
           <textarea id="product-note" v-model="note" rows="3"></textarea>
+        </label>
+        <label>
+          <input v-model="finished" type="checkbox">
+          {{ translate('productFinished') }}
         </label>
         <label class="product-form__field">
           <span>{{ translate('productOpenedOn') }}</span>

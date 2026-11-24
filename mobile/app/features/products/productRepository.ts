@@ -11,6 +11,7 @@ type ProductRow = {
   opened_on: CalendarDate | null
   pao_months: number | null
   archived_at: string | null
+  finished: number
 } & (
   | { expiry_kind: null }
   | { expiry_kind: 'date'; expires_on: CalendarDate }
@@ -40,6 +41,7 @@ function toProduct(row: ProductRow): Product {
     paoMonths: row.pao_months,
     expiry,
     archivedAt: row.archived_at,
+    finished: row.finished === 1,
   }
 }
 
@@ -78,8 +80,8 @@ export function deleteProduct(id: string): Promise<void> {
 const insertProduct = `
     INSERT INTO products (
       id, name, note, photo_id, icon_id, opened_on, pao_months, expiry_kind, expires_on,
-      manufactured_on, shelf_duration, shelf_unit, archived_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      manufactured_on, shelf_duration, shelf_unit, archived_at, finished
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 function productValues(product: Product) {
@@ -89,7 +91,7 @@ function productValues(product: Product) {
     product.id, product.name, product.note, product.photoId, product.iconId, product.openedOn, product.paoMonths,
     expiry?.kind ?? null, expiry?.kind === 'date' ? expiry.expiresOn : null,
     shelfLife?.manufacturedOn ?? null, shelfLife?.duration ?? null, shelfLife?.unit ?? null,
-    product.archivedAt,
+    product.archivedAt, Number(product.finished),
   ]
 }
 
@@ -107,7 +109,8 @@ export function saveProduct(product: Product): Promise<void> {
       manufactured_on = excluded.manufactured_on,
       shelf_duration = excluded.shelf_duration,
       shelf_unit = excluded.shelf_unit,
-      archived_at = excluded.archived_at;
+      archived_at = excluded.archived_at,
+      finished = excluded.finished;
   `, productValues(product))
 }
 

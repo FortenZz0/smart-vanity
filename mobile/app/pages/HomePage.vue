@@ -30,7 +30,7 @@ const cards = computed(() => products.value.map((product) => {
 
 const active = computed(() => cards.value.filter(({ product }) => product.archivedAt === null))
 const expiringSoon = computed(() => active.value
-  .filter((card) => card.expiringSoon)
+  .filter(({ product, expiringSoon }) => !product.finished && expiringSoon)
   .sort((a, b) => (a.expiry.remainingDays ?? 0) - (b.expiry.remainingDays ?? 0)))
 
 const upcomingRituals = computed(() => {

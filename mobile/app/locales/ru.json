@@ -104,6 +104,7 @@
   "productNotFound": "Товар не найден",
   "productLoadError": "Не удалось загрузить товар",
   "productName": "Название товара",
+  "productFinished": "Кончился",
   "productNote": "Заметка",
   "chooseProductPhoto": "Загрузить фото",
   "chooseProductIcon": "Выбрать иконку",

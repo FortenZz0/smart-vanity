@@ -88,9 +88,9 @@ const expiryLabel = computed(() => {
       </h3>
       <span
         class="product-card__expiry"
-        :class="{ 'product-card__expiry--warning': product.archivedAt === null && (expiringSoon || expiry.status === 'expired') }"
+        :class="{ 'product-card__expiry--warning': !product.finished && product.archivedAt === null && (expiringSoon || expiry.status === 'expired') }"
       >
-        {{ expiryLabel }}
+        {{ product.finished ? translate('productFinished') : expiryLabel }}
       </span>
     </div>
     <button
