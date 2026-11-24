@@ -4,6 +4,7 @@
   "profile": "Профиль",
   "navigation": "Разделы приложения",
   "rituals": "Ритуалы",
+  "upcomingRituals": "Ближайшие ритуалы",
   "ritualsLoading": "Загружаем ритуалы…",
   "ritualsLoadError": "Не удалось загрузить ритуалы",
   "activeRituals": "Активные",

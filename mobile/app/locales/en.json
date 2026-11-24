@@ -4,6 +4,7 @@
   "profile": "Profile",
   "navigation": "App sections",
   "rituals": "Rituals",
+  "upcomingRituals": "Upcoming rituals",
   "ritualsLoading": "Loading rituals…",
   "ritualsLoadError": "Could not load rituals",
   "activeRituals": "Active",
