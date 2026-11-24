@@ -9,10 +9,10 @@ import { getNextRitualReminder } from '../features/rituals/nextRitualReminder'
 import type { Ritual } from '../features/rituals/ritual'
 import RitualCard from '../features/rituals/RitualCard.vue'
 import { listRituals } from '../features/rituals/ritualRepository'
+import { upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
 import { translate } from '../locales'
 
 const soonThresholdDays = 30
-const upcomingRitualHours = 24
 const rituals = ref<Ritual[]>([])
 const now = ref(new Date())
 let ritualClock: number | undefined
@@ -36,7 +36,7 @@ const expiringSoon = computed(() => active.value
 
 const upcomingRituals = computed(() => {
   const currentTime = now.value.getTime()
-  const cutoff = currentTime + upcomingRitualHours * 3_600_000
+  const cutoff = currentTime + upcomingRitualHours.value * 3_600_000
   return rituals.value.flatMap((ritual) => {
     if (ritual.archivedAt !== null) return []
     const next = getNextRitualReminder(ritual, now.value)

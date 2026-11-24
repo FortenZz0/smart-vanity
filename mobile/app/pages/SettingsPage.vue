@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { setUpcomingRitualHours, upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
 import { languages, locale, translate } from '../locales'
 import { theme, themes } from '../theme'
+
+const draftHours = ref<number | string>(upcomingRitualHours.value)
 </script>
 
 <template>
@@ -22,5 +26,18 @@ import { theme, themes } from '../theme'
         </option>
       </select>
     </p>
+    <form @submit.prevent="setUpcomingRitualHours(Number(draftHours))">
+      <label for="upcoming-ritual-hours">{{ translate('upcomingRitualHoursSetting') }}</label>
+      <input
+        id="upcoming-ritual-hours"
+        v-model.number="draftHours"
+        type="number"
+        min="1"
+        :max="Number.MAX_SAFE_INTEGER"
+        step="1"
+        required
+      >
+      <button type="submit" :disabled="draftHours === upcomingRitualHours">{{ translate('save') }}</button>
+    </form>
   </section>
 </template>

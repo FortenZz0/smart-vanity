@@ -5,6 +5,7 @@
   "navigation": "App sections",
   "rituals": "Rituals",
   "upcomingRituals": "Upcoming rituals",
+  "upcomingRitualHoursSetting": "Upcoming ritual window (hours)",
   "ritualsLoading": "Loading rituals…",
   "ritualsLoadError": "Could not load rituals",
   "activeRituals": "Active",

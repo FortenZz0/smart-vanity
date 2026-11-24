@@ -5,6 +5,7 @@
   "navigation": "Разделы приложения",
   "rituals": "Ритуалы",
   "upcomingRituals": "Ближайшие ритуалы",
+  "upcomingRitualHoursSetting": "Период показа ближайших ритуалов (часы)",
   "ritualsLoading": "Загружаем ритуалы…",
   "ritualsLoadError": "Не удалось загрузить ритуалы",
   "activeRituals": "Активные",
