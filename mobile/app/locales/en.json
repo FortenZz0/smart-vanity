@@ -33,6 +33,7 @@
   "resumeRitual": "Resume reminders",
   "ritualPaused": "Paused",
   "ritualReminderActionError": "Could not update reminders. Try again.",
+  "ritualRestoreError": "Could not restore the ritual. Try again.",
   "ritualNotificationBody": "Time for your ritual",
   "ritualTomorrow": "tomorrow",
   "ritualNextReminderUnavailable": "No upcoming reminder",

@@ -5,20 +5,21 @@ import pauseIcon from '../../../assets/icons/pause_circle.svg'
 import playIcon from '../../../assets/icons/play_circle.svg'
 import skipIcon from '../../../assets/icons/skip_next.svg'
 import previousIcon from '../../../assets/icons/skip_previous.svg'
+import restoreIcon from '../../../assets/icons/unarchive.svg'
 import { translate } from '../../locales'
 import { getNextRitualReminder } from './nextRitualReminder'
 import type { Ritual } from './ritual'
 import { syncRitualNotifications } from './ritualNotifications'
-import { getRitual, setRitualPaused, skipRitualReminder, undoRitualSkip } from './ritualRepository'
+import { getRitual, restoreRitual, setRitualPaused, skipRitualReminder, undoRitualSkip } from './ritualRepository'
 
 const props = withDefaults(defineProps<{ ritual: Ritual; now?: Date; interactive?: boolean }>(), {
   now: () => new Date(),
 })
 const emit = defineEmits<{ updated: [ritual: Ritual] }>()
 const pending = ref(false)
-const actionFailed = ref(false)
+const actionError = ref<'ritualReminderActionError' | 'ritualRestoreError' | null>(null)
 
-const showActions = computed(() => props.interactive && props.ritual.archivedAt === null)
+const archived = computed(() => props.ritual.archivedAt !== null)
 const canUndo = computed(() => !props.ritual.paused && props.ritual.skippedThrough !== null
   && props.ritual.skippedThrough >= props.now.getTime())
 const pauseLabel = computed(() => translate(props.ritual.paused ? 'resumeRitual' : 'pauseRitual'))
@@ -35,26 +36,27 @@ const reminderDate = computed(() => {
   return `${day}.${month}`
 })
 
-async function updateReminder(action: 'previous' | 'pause' | 'next') {
-  if (!showActions.value || pending.value) return
+async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
+  if (!props.interactive || pending.value || archived.value !== (action === 'restore')) return
   const { id, paused, skippedThrough } = props.ritual
   const next = reminder.value
   if (action === 'previous' && (!canUndo.value || skippedThrough === null)) return
   if (action === 'next' && !next) return
 
   pending.value = true
-  actionFailed.value = false
+  actionError.value = null
   try {
-    if (action === 'pause') await setRitualPaused(id, !paused)
+    if (action === 'restore') await restoreRitual(id)
+    else if (action === 'pause') await setRitualPaused(id, !paused)
     else if (action === 'previous' && skippedThrough !== null) await undoRitualSkip(id, skippedThrough)
     else if (action === 'next' && next) await skipRitualReminder(id, next.timestamp)
 
-    syncRitualNotifications(action === 'pause' && paused)
+    syncRitualNotifications((action === 'restore' && !paused) || (action === 'pause' && paused))
     const updated = await getRitual(id)
     if (updated) emit('updated', updated)
   } catch (error) {
-    console.error('Failed to update the ritual reminder', error)
-    actionFailed.value = true
+    console.error('Failed to update the ritual', error)
+    actionError.value = action === 'restore' ? 'ritualRestoreError' : 'ritualReminderActionError'
   } finally {
     pending.value = false
   }
@@ -62,7 +64,7 @@ async function updateReminder(action: 'previous' | 'pause' | 'next') {
 </script>
 
 <template>
-  <article class="ritual-card" :class="{ 'ritual-card--with-actions': showActions }">
+  <article class="ritual-card" :class="{ 'ritual-card--with-actions': interactive }">
     <h2 :title="ritual.name">
       <RouterLink
         v-if="interactive"
@@ -80,13 +82,24 @@ async function updateReminder(action: 'previous' | 'pause' | 'next') {
       </template>
       <template v-else>{{ translate('ritualNextReminderUnavailable') }}</template>
     </span>
-    <div v-if="showActions" class="ritual-card__actions">
+    <div v-if="interactive && archived" class="ritual-card__actions ritual-card__actions--archived">
+      <button
+        type="button"
+        :aria-label="translate('restoreFromArchive')"
+        :title="translate('restoreFromArchive')"
+        :disabled="pending"
+        @click="updateRitual('restore')"
+      >
+        <span :style="{ maskImage: `url(${JSON.stringify(restoreIcon)})` }" aria-hidden="true"></span>
+      </button>
+    </div>
+    <div v-else-if="interactive" class="ritual-card__actions">
       <button
         type="button"
         :aria-label="translate('undoRitualSkip')"
         :title="translate('undoRitualSkip')"
         :disabled="pending || !canUndo"
-        @click="updateReminder('previous')"
+        @click="updateRitual('previous')"
       >
         <span :style="{ maskImage: `url(${JSON.stringify(previousIcon)})` }" aria-hidden="true"></span>
       </button>
@@ -96,7 +109,7 @@ async function updateReminder(action: 'previous' | 'pause' | 'next') {
         :aria-label="pauseLabel"
         :title="pauseLabel"
         :disabled="pending"
-        @click="updateReminder('pause')"
+        @click="updateRitual('pause')"
       >
         <span :style="{ maskImage: `url(${JSON.stringify(ritual.paused ? playIcon : pauseIcon)})` }" aria-hidden="true"></span>
       </button>
@@ -105,12 +118,12 @@ async function updateReminder(action: 'previous' | 'pause' | 'next') {
         :aria-label="translate('skipRitualReminder')"
         :title="translate('skipRitualReminder')"
         :disabled="pending || !reminder"
-        @click="updateReminder('next')"
+        @click="updateRitual('next')"
       >
         <span :style="{ maskImage: `url(${JSON.stringify(skipIcon)})` }" aria-hidden="true"></span>
       </button>
     </div>
-    <p v-if="actionFailed" class="ritual-card__error" role="alert">{{ translate('ritualReminderActionError') }}</p>
+    <p v-if="actionError" class="ritual-card__error" role="alert">{{ translate(actionError) }}</p>
   </article>
 </template>
 
@@ -170,6 +183,10 @@ async function updateReminder(action: 'previous' | 'pause' | 'next') {
   background: transparent;
   color: var(--color-text-muted);
   cursor: pointer;
+}
+
+.ritual-card__actions--archived {
+  grid-row: 1;
 }
 
 .ritual-card__actions .ritual-card__toggle {

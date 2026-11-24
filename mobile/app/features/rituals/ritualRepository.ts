@@ -86,6 +86,10 @@ export function setRitualPaused(id: string, paused: boolean): Promise<void> {
   return writeDatabase('UPDATE rituals SET paused = ? WHERE id = ? AND archived_at IS NULL', [Number(paused), id])
 }
 
+export function restoreRitual(id: string): Promise<void> {
+  return writeDatabase('UPDATE rituals SET archived_at = NULL WHERE id = ? AND archived_at IS NOT NULL', [id])
+}
+
 export async function saveRitual(ritual: Omit<Ritual, 'skippedThrough' | 'paused'>): Promise<void> {
   const result = validateRitualInput(ritual)
   if (!result.valid) throw new TypeError('Invalid ritual data')
