@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import RitualCard from '../features/rituals/RitualCard.vue'
 import type { Ritual } from '../features/rituals/ritual'
 import { listRituals } from '../features/rituals/ritualRepository'
@@ -63,7 +64,9 @@ onUnmounted(() => window.clearInterval(clock))
         <summary>{{ translate(section.title) }}</summary>
         <ul v-if="section.rituals.length" class="rituals__list" role="list">
           <li v-for="ritual in section.rituals" :key="ritual.id">
-            <RitualCard :ritual="ritual" :now="now" />
+            <RouterLink class="rituals__link" :to="{ name: 'edit-ritual', params: { ritualId: ritual.id } }">
+              <RitualCard :ritual="ritual" :now="now" />
+            </RouterLink>
           </li>
         </ul>
         <p v-else class="rituals__status">{{ translate(section.empty) }}</p>
@@ -98,6 +101,13 @@ onUnmounted(() => window.clearInterval(clock))
 .rituals__status {
   margin: 0;
   color: var(--color-text-muted);
+}
+
+.rituals__link {
+  display: block;
+  border-radius: 0.875rem;
+  color: inherit;
+  text-decoration: none;
 }
 
 .rituals__status[role='alert'] {

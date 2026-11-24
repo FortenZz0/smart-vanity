@@ -19,8 +19,8 @@ const props = defineProps<{
 
 const actions = {
   open: { icon: openIcon, label: 'openProduct' },
-  archive: { icon: archiveIcon, label: 'archiveProduct' },
-  restore: { icon: restoreIcon, label: 'restoreProduct' },
+  archive: { icon: archiveIcon, label: 'moveToArchive' },
+  restore: { icon: restoreIcon, label: 'restoreFromArchive' },
 } as const
 
 defineEmits<{ quickAction: [action: keyof typeof actions] }>()

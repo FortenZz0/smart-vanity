@@ -1,23 +1,27 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import EditorActions from '../components/EditorActions.vue'
 import { getLocalToday } from '../features/products/expiry'
 import type { Weekday } from '../features/rituals/ritual'
-import { saveRitual } from '../features/rituals/ritualRepository'
+import { deleteRitual, getRitual, saveRitual } from '../features/rituals/ritualRepository'
 import { validateRitualInput, type RitualInput } from '../features/rituals/ritualValidation'
 import { locale, translate } from '../locales'
 
 const router = useRouter()
+const props = defineProps<{ ritualId?: string }>()
+const loadState = ref<'loading' | 'ready' | 'missing' | 'error'>(props.ritualId ? 'loading' : 'ready')
 const name = ref('')
 const scheduleKind = ref<RitualInput['schedule']['kind']>('daily')
 const everyDays = ref('')
 const startsOn = ref<string>(getLocalToday())
 const selectedWeekdays = ref<Weekday[]>([])
-const reminders = ref([{ id: crypto.randomUUID(), time: '09:00' }])
+const reminders = ref<RitualInput['reminders'][number][]>([{ id: crypto.randomUUID(), time: '09:00' }])
 const submitted = ref(false)
 const saving = ref(false)
-const saveFailed = ref(false)
-let ritualId: string | undefined
+const actionError = ref<'ritualSaveError' | 'ritualDeleteError' | null>(null)
+const archivedAt = ref<string | null>(null)
+let ritualId = props.ritualId
 
 const weekdays: readonly Weekday[] = [1, 2, 3, 4, 5, 6, 7]
 const shortWeekdays = {
@@ -45,6 +49,36 @@ const validation = computed(() => {
 })
 const errors = computed(() => submitted.value && !validation.value.valid ? validation.value.errors : {})
 
+async function loadRitual() {
+  if (!props.ritualId) return
+
+  loadState.value = 'loading'
+  try {
+    const ritual = await getRitual(props.ritualId)
+    if (!ritual) {
+      loadState.value = 'missing'
+      return
+    }
+
+    name.value = ritual.name
+    archivedAt.value = ritual.archivedAt
+    scheduleKind.value = ritual.schedule.kind
+    if (ritual.schedule.kind === 'interval') {
+      everyDays.value = String(ritual.schedule.everyDays)
+      startsOn.value = ritual.schedule.startsOn
+    } else if (ritual.schedule.kind === 'weekly') {
+      selectedWeekdays.value = [...ritual.schedule.weekdays]
+    }
+    reminders.value = ritual.reminders.map(({ id, time }) => ({ id, time }))
+    loadState.value = 'ready'
+  } catch (error) {
+    console.error('Failed to load the ritual', error)
+    loadState.value = 'error'
+  }
+}
+
+onMounted(loadRitual)
+
 function addReminder() {
   reminders.value.push({ id: crypto.randomUUID(), time: '' })
 }
@@ -58,21 +92,44 @@ function goToRituals() {
   }
 }
 
-async function submitRitual() {
-  if (saving.value) return
+async function removeRitual() {
+  const id = props.ritualId
+  if (!id || loadState.value !== 'ready' || saving.value || !window.confirm(translate('confirmDeleteRitual'))) return
+
+  const submittedFrom = router.currentRoute.value
+  saving.value = true
+  actionError.value = null
+  try {
+    await deleteRitual(id)
+  } catch (error) {
+    console.error('Failed to delete the ritual', error)
+    actionError.value = 'ritualDeleteError'
+    return
+  } finally {
+    saving.value = false
+  }
+  if (router.currentRoute.value === submittedFrom) goToRituals()
+}
+
+async function submitRitual(event: SubmitEvent) {
+  if (saving.value || loadState.value !== 'ready') return
   submitted.value = true
-  saveFailed.value = false
+  actionError.value = null
   const result = validation.value
   if (!result.valid) return
 
   const submittedFrom = router.currentRoute.value
+  const action = event.submitter?.getAttribute('value')
+  let nextArchivedAt = archivedAt.value
+  if (props.ritualId && action === 'archive') nextArchivedAt = new Date().toISOString()
+  if (props.ritualId && action === 'restore') nextArchivedAt = null
   saving.value = true
   try {
     ritualId ??= crypto.randomUUID()
-    await saveRitual({ id: ritualId, ...result.value })
+    await saveRitual({ id: ritualId, archivedAt: nextArchivedAt, ...result.value })
   } catch (error) {
     console.error('Failed to save the ritual', error)
-    saveFailed.value = true
+    actionError.value = 'ritualSaveError'
     return
   } finally {
     saving.value = false
@@ -86,9 +143,15 @@ async function submitRitual() {
     <button class="ritual-back" type="button" :disabled="saving" @click="goToRituals">
       <span aria-hidden="true">←</span> {{ translate('back') }}
     </button>
-    <h1>{{ translate('createRitual') }}</h1>
+    <h1>{{ translate(props.ritualId ? 'editRitual' : 'createRitual') }}</h1>
 
-    <form class="ritual-form" novalidate @submit.prevent="submitRitual">
+    <p v-if="loadState === 'loading'" role="status">{{ translate('ritualLoading') }}</p>
+    <p v-else-if="loadState === 'missing'" role="status">{{ translate('ritualNotFound') }}</p>
+    <div v-else-if="loadState === 'error'">
+      <p role="alert">{{ translate('ritualLoadError') }}</p>
+      <button type="button" @click="loadRitual">{{ translate('tryAgain') }}</button>
+    </div>
+    <form v-else class="ritual-form" novalidate @submit.prevent="submitRitual">
       <fieldset class="ritual-form__fields" :disabled="saving">
         <label class="ritual-form__field">
           {{ translate('ritualName') }}
@@ -159,8 +222,12 @@ async function submitRitual() {
           <button type="button" @click="addReminder">{{ translate('addRitualReminder') }}</button>
         </fieldset>
 
-        <button class="ritual-form__save" type="submit">{{ translate('saveRitual') }}</button>
-        <p v-if="saveFailed" role="alert">{{ translate('ritualSaveError') }}</p>
+        <EditorActions
+          :archive-action="props.ritualId ? (archivedAt === null ? 'archive' : 'restore') : undefined"
+          :submit-disabled="!name || saving"
+          @delete="removeRitual"
+        />
+        <p v-if="actionError" role="alert">{{ translate(actionError) }}</p>
       </fieldset>
     </form>
   </section>
@@ -276,12 +343,6 @@ async function submitRitual() {
 
 .ritual-form__reminder p {
   flex-basis: 100%;
-}
-
-.ritual-form .ritual-form__save {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
 }
 
 .ritual-form [role='alert'] {

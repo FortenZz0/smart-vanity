@@ -3,7 +3,7 @@ import HomePage from './pages/HomePage.vue'
 import ProductEditorPage from './pages/ProductEditorPage.vue'
 import ExplorePage from './pages/ExplorePage.vue'
 import ProfilePage from './pages/ProfilePage.vue'
-import RitualCreatePage from './pages/RitualCreatePage.vue'
+import RitualEditorPage from './pages/RitualEditorPage.vue'
 import RitualsPage from './pages/RitualsPage.vue'
 import SettingsPage from './pages/SettingsPage.vue'
 
@@ -36,7 +36,14 @@ export const router = createRouter({
     {
       path: '/profile/rituals/new',
       name: 'create-ritual',
-      component: RitualCreatePage,
+      component: RitualEditorPage,
+      meta: { navSection: 'profile' },
+    },
+    {
+      path: '/profile/rituals/:ritualId/edit',
+      name: 'edit-ritual',
+      component: RitualEditorPage,
+      props: true,
       meta: { navSection: 'profile' },
     },
     {

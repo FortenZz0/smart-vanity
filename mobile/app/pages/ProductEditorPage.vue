@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
+import EditorActions from '../components/EditorActions.vue'
 import { getProductExpiry, parseCalendarDate } from '../features/products/expiry'
 import type { ExpiryInput, Product, ShelfLifeUnit } from '../features/products/product'
 import { discardUnattachedProductPhoto, getProductPhoto, saveProductPhoto } from '../features/products/productPhotos'
@@ -338,21 +339,11 @@ async function submitProduct(event: SubmitEvent) {
         <p v-if="expiryPreview">{{ translate('productEffectiveExpiry').replace('{date}', expiryPreview) }}</p>
         <p v-if="datesInvalid && !checkedExpiry" role="alert">{{ translate('productDatesInvalid') }}</p>
 
-        <div class="product-form__actions">
-          <button type="submit" :disabled="!name || saving || photoLoading">{{ translate('saveProduct') }}</button>
-          <button
-            v-if="originalProduct"
-            class="product-form__archive"
-            type="submit"
-            :value="originalProduct.archivedAt === null ? 'archive' : 'restore'"
-            :disabled="!name || saving || photoLoading"
-          >
-            {{ translate(originalProduct.archivedAt === null ? 'archiveProduct' : 'restoreProduct') }}
-          </button>
-          <button v-if="originalProduct" class="product-form__delete" type="button" @click="removeProduct">
-            {{ translate('deleteProduct') }}
-          </button>
-        </div>
+        <EditorActions
+          :archive-action="originalProduct ? (originalProduct.archivedAt === null ? 'archive' : 'restore') : undefined"
+          :submit-disabled="!name || saving || photoLoading"
+          @delete="removeProduct"
+        />
         <p v-if="actionError" role="alert">{{ translate(actionError) }}</p>
       </fieldset>
     </form>
@@ -504,39 +495,6 @@ async function submitProduct(event: SubmitEvent) {
 
 .expiry-toggle__options input:focus-visible + span {
   outline: 2px solid var(--color-accent);
-}
-
-.product-form__actions {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: 0.5rem;
-}
-
-.product-form__actions button {
-  min-block-size: 2.75rem;
-  padding: 0.5rem;
-  border: 0;
-  border-radius: 0.375rem;
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  font: inherit;
-  overflow-wrap: anywhere;
-}
-
-.product-form__actions button:disabled {
-  opacity: 0.55;
-}
-
-.product-form__actions :is(.product-form__archive, .product-form__delete) {
-  border: 1px solid var(--color-divider);
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-.product-form__actions .product-form__delete {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
 }
 
 .product-form p {

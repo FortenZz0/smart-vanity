@@ -1,4 +1,4 @@
-import { queryDatabase, writeDatabaseTransaction } from '../../storage/database'
+import { queryDatabase, writeDatabase, writeDatabaseTransaction } from '../../storage/database'
 import type { Ritual } from './ritual'
 import { validateRitualInput, type RitualInput } from './ritualValidation'
 
@@ -11,14 +11,15 @@ type RitualRow = {
   reminder_time: string | null
 }
 
-export async function listRituals(): Promise<Ritual[]> {
+async function readRituals(id?: string): Promise<Ritual[]> {
   const rows = await queryDatabase<RitualRow>(`
     SELECT rituals.id, rituals.name, rituals.schedule, rituals.archived_at,
       ritual_reminders.id AS reminder_id, ritual_reminders.time AS reminder_time
     FROM rituals
     LEFT JOIN ritual_reminders ON ritual_reminders.ritual_id = rituals.id
+    ${id === undefined ? '' : 'WHERE rituals.id = ?'}
     ORDER BY rituals.name, rituals.id, ritual_reminders.position
-  `)
+  `, id === undefined ? [] : [id])
   const inputs = new Map<string, Omit<RitualInput, 'reminders'> & {
     archivedAt: Ritual['archivedAt']
     reminders: RitualInput['reminders'][number][]
@@ -42,11 +43,24 @@ export async function listRituals(): Promise<Ritual[]> {
   })
 }
 
-export async function saveRitual(ritual: Omit<Ritual, 'archivedAt'>): Promise<void> {
+export function listRituals(): Promise<Ritual[]> {
+  return readRituals()
+}
+
+export async function getRitual(id: string): Promise<Ritual | null> {
+  const [ritual] = await readRituals(id)
+  return ritual ?? null
+}
+
+export function deleteRitual(id: string): Promise<void> {
+  return writeDatabase('DELETE FROM rituals WHERE id = ?', [id])
+}
+
+export async function saveRitual(ritual: Ritual): Promise<void> {
   const result = validateRitualInput(ritual)
   if (!result.valid) throw new TypeError('Invalid ritual data')
 
-  const { id } = ritual
+  const { id, archivedAt } = ritual
   const { name, schedule, reminders } = result.value
   const reminderIds = reminders.map((reminder) => reminder.id)
   if (!id.trim() || reminderIds.some((reminderId) => !reminderId.trim())
@@ -57,10 +71,11 @@ export async function saveRitual(ritual: Omit<Ritual, 'archivedAt'>): Promise<vo
   await writeDatabaseTransaction([
     {
       statement: `
-        INSERT INTO rituals (id, name, schedule) VALUES (?, ?, ?)
-        ON CONFLICT(id) DO UPDATE SET name = excluded.name, schedule = excluded.schedule;
+        INSERT INTO rituals (id, name, schedule, archived_at) VALUES (?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          name = excluded.name, schedule = excluded.schedule, archived_at = excluded.archived_at;
       `,
-      values: [id, name, JSON.stringify(schedule)],
+      values: [id, name, JSON.stringify(schedule), archivedAt],
     },
     ...reminders.map((reminder, position) => ({
       statement: `

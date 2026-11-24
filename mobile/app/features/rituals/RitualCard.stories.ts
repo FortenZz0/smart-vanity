@@ -25,7 +25,3 @@ export const Today: Story = {
 export const Tomorrow: Story = {
   args: { now: new Date(2026, 10, 24, 9, 0) },
 }
-
-export const SomeDay: Story = {
-  args: { now: new Date(2026, 10, 24, 10, 0) }
-}
