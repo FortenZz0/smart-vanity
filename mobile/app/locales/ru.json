@@ -27,6 +27,7 @@
   "ritualWeekdays": "Дни недели",
   "ritualReminders": "Напоминания",
   "ritualReminderTime": "Время напоминания",
+  "ritualNotificationBody": "Время выполнить ритуал",
   "ritualTomorrow": "завтра",
   "ritualNextReminderUnavailable": "Нет ближайшего напоминания",
   "addRitualReminder": "Добавить напоминание",

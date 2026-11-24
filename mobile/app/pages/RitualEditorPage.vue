@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import EditorActions from '../components/EditorActions.vue'
 import { getLocalToday } from '../features/products/expiry'
+import { syncRitualNotifications } from '../features/rituals/ritualNotifications'
 import type { Weekday } from '../features/rituals/ritual'
 import { deleteRitual, getRitual, saveRitual } from '../features/rituals/ritualRepository'
 import { validateRitualInput, type RitualInput } from '../features/rituals/ritualValidation'
@@ -101,6 +102,7 @@ async function removeRitual() {
   actionError.value = null
   try {
     await deleteRitual(id)
+    syncRitualNotifications()
   } catch (error) {
     console.error('Failed to delete the ritual', error)
     actionError.value = 'ritualDeleteError'
@@ -127,6 +129,7 @@ async function submitRitual(event: SubmitEvent) {
   try {
     ritualId ??= crypto.randomUUID()
     await saveRitual({ id: ritualId, archivedAt: nextArchivedAt, ...result.value })
+    syncRitualNotifications(nextArchivedAt === null)
   } catch (error) {
     console.error('Failed to save the ritual', error)
     actionError.value = 'ritualSaveError'

@@ -27,6 +27,7 @@
   "ritualWeekdays": "Days of the week",
   "ritualReminders": "Reminders",
   "ritualReminderTime": "Reminder time",
+  "ritualNotificationBody": "Time for your ritual",
   "ritualTomorrow": "tomorrow",
   "ritualNextReminderUnavailable": "No upcoming reminder",
   "addRitualReminder": "Add reminder",
