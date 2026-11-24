@@ -14,6 +14,7 @@ import { validateRitualInput, type RitualInput } from '../rituals/ritualValidati
 type BackupPhoto = { mimeType: string; base64: string }
 type BackupProduct = Omit<Product, 'photoId'> & { photo: BackupPhoto | null }
 type BackupRitual = Omit<Ritual, 'skippedThrough'> & { skips: number[] }
+type BackupOptions = { includeProducts: boolean; includePhotos: boolean; includeRituals: boolean }
 
 const format = 'smart-vanity-products'
 const version = 1
@@ -107,7 +108,7 @@ function readRitual(value: unknown): BackupRitual {
   return { id, archivedAt, paused, skips: [...new Set(skips)], ...result.value }
 }
 
-function parseBackup(json: string, includeRituals: boolean) {
+function parseBackup(json: string, options: BackupOptions) {
   let value: unknown
   try {
     value = JSON.parse(json)
@@ -117,10 +118,10 @@ function parseBackup(json: string, includeRituals: boolean) {
   if (!isRecord(value) || value.format !== format || value.version !== version || !Array.isArray(value.products)) {
     return invalidBackup()
   }
-  const products = value.products.map(readProduct)
+  const products = options.includeProducts ? value.products.map(readProduct) : []
   if (new Set(products.map(({ id }) => id)).size !== products.length) return invalidBackup()
   let rituals: BackupRitual[] = []
-  if (includeRituals && value.rituals !== undefined) {
+  if (options.includeRituals && value.rituals !== undefined) {
     if (!Array.isArray(value.rituals)) return invalidBackup()
     rituals = value.rituals.map(readRitual)
     if (new Set(rituals.map(({ id }) => id)).size !== rituals.length) return invalidBackup()
@@ -146,10 +147,10 @@ function insertRitualStatements(ritual: BackupRitual) {
   ]
 }
 
-export async function importBackup(json: string, options: { includePhotos: boolean; includeRituals: boolean }): Promise<void> {
-  const { products, rituals } = parseBackup(json, options.includeRituals)
+export async function importBackup(json: string, options: BackupOptions): Promise<void> {
+  const { products, rituals } = parseBackup(json, options)
   const [currentProducts, currentRituals] = await Promise.all([
-    listProducts(),
+    products.length ? queryDatabase<{ id: string }>('SELECT id FROM products') : [],
     rituals.length ? queryDatabase<{ id: string }>('SELECT id FROM rituals') : [],
   ])
   const existing = new Set(currentProducts.map(({ id }) => id))
@@ -182,17 +183,19 @@ export async function importBackup(json: string, options: { includePhotos: boole
   if (pendingRituals.length) syncRitualNotifications()
 }
 
-export async function resetBackupData(): Promise<void> {
-  const photos = await queryDatabase<{ photo_id: string }>(
+export async function resetBackupData(options: { products: boolean; rituals: boolean }): Promise<void> {
+  if (!options.products && !options.rituals) return
+
+  const photos = options.products ? await queryDatabase<{ photo_id: string }>(
     'SELECT DISTINCT photo_id FROM products WHERE photo_id IS NOT NULL',
-  )
-  await writeDatabaseTransaction([
-    { statement: 'DELETE FROM products;', values: [] },
-    { statement: 'DELETE FROM ritual_reminders;', values: [] },
-    { statement: 'DELETE FROM ritual_skips;', values: [] },
-    { statement: 'DELETE FROM rituals;', values: [] },
-  ])
-  syncRitualNotifications()
+  ) : []
+  const statements: string[] = []
+  if (options.products) statements.push('DELETE FROM products;')
+  if (options.rituals) {
+    statements.push('DELETE FROM ritual_reminders;', 'DELETE FROM ritual_skips;', 'DELETE FROM rituals;')
+  }
+  await writeDatabaseTransaction(statements.map((statement) => ({ statement, values: [] })))
+  if (options.rituals) syncRitualNotifications()
 
   for (const { photo_id } of photos) {
     await discardUnattachedProductPhoto(photo_id).catch((error: unknown) => {
@@ -218,15 +221,19 @@ async function exportRituals(): Promise<BackupRitual[]> {
   }))
 }
 
-export async function exportBackup(): Promise<void> {
+export async function exportBackup(options: BackupOptions): Promise<void> {
   const products: BackupProduct[] = []
-  for (const { photoId, ...product } of await listProducts()) {
-    const blob = photoId ? await getProductPhoto(photoId) : null
-    if (photoId && !blob) throw new Error('Product photo is missing')
-    const photo = blob ? { mimeType: blob.type, base64: await readBase64(blob) } : null
+  const sourceProducts = options.includeProducts ? await listProducts() : []
+  for (const { photoId, ...product } of sourceProducts) {
+    let photo: BackupPhoto | null = null
+    if (options.includePhotos && photoId) {
+      const blob = await getProductPhoto(photoId)
+      if (!blob) throw new Error('Product photo is missing')
+      photo = { mimeType: blob.type, base64: await readBase64(blob) }
+    }
     products.push({ ...product, photo })
   }
-  const rituals = await exportRituals()
+  const rituals = options.includeRituals ? await exportRituals() : []
   const json = JSON.stringify({ format, version, products, rituals }, null, 2)
   const filename = `smart-vanity-${new Date().toISOString().slice(0, 10)}.json`
 
