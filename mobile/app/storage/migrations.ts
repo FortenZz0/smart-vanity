@@ -59,4 +59,17 @@ export const migrations: capSQLiteVersionUpgrade[] = [
     toVersion: 5,
     statements: ['ALTER TABLE rituals ADD COLUMN skipped_through INTEGER;'],
   },
+  {
+    toVersion: 6,
+    statements: [
+      'ALTER TABLE rituals ADD COLUMN paused INTEGER NOT NULL DEFAULT 0 CHECK (paused IN (0, 1));',
+      `CREATE TABLE ritual_skips (
+        ritual_id TEXT NOT NULL REFERENCES rituals(id) ON DELETE CASCADE,
+        timestamp INTEGER NOT NULL,
+        PRIMARY KEY (ritual_id, timestamp)
+      );`,
+      `INSERT INTO ritual_skips (ritual_id, timestamp)
+      SELECT id, skipped_through FROM rituals WHERE skipped_through IS NOT NULL;`,
+    ],
+  },
 ]

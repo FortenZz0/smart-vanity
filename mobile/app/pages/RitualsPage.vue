@@ -67,7 +67,7 @@ onUnmounted(() => window.clearInterval(clock))
               :ritual="ritual"
               :now="now"
               interactive
-              @skipped="ritual.skippedThrough = $event"
+              @updated="Object.assign(ritual, $event)"
             />
           </li>
         </ul>

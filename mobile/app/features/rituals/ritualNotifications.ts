@@ -44,7 +44,7 @@ function reminderSchedules(ritual: Ritual, now: Date): Schedule[] {
 }
 
 async function reconcileNotifications(requestPermission: boolean): Promise<void> {
-  const rituals = (await listRituals()).filter(({ archivedAt }) => archivedAt === null)
+  const rituals = (await listRituals()).filter(({ archivedAt, paused }) => archivedAt === null && !paused)
   const [{ notifications: pending }, { notifications: delivered }] = await Promise.all([
     LocalNotifications.getAll({ state: 'SCHEDULED' }),
     LocalNotifications.getAll({ state: 'TRIGGERED' }),

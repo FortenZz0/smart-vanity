@@ -37,7 +37,7 @@ const upcomingRituals = computed(() => {
   const currentTime = now.value.getTime()
   const cutoff = currentTime + upcomingRitualHours.value * 3_600_000
   return rituals.value.flatMap((ritual) => {
-    if (ritual.archivedAt !== null) return []
+    if (ritual.archivedAt !== null || ritual.paused) return []
     const next = getNextRitualReminder(ritual, now.value)
     if (!next) return []
 
@@ -143,7 +143,7 @@ async function runProductAction(product: Product, action: keyof typeof productAc
             :ritual="ritual"
             :now="now"
             interactive
-            @skipped="ritual.skippedThrough = $event"
+            @updated="Object.assign(ritual, $event)"
           />
         </li>
       </ul>

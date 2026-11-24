@@ -5,6 +5,7 @@ import type { Ritual } from './ritual'
 const ritual: Ritual = {
   id: 'demo',
   archivedAt: null,
+  paused: false,
   skippedThrough: null,
   name: 'Утренний уход',
   schedule: { kind: 'daily' },

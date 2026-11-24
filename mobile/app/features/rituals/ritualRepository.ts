@@ -7,6 +7,7 @@ type RitualRow = {
   name: string
   schedule: string
   archived_at: string | null
+  paused: number
   skipped_through: number | null
   reminder_id: string | null
   reminder_time: string | null
@@ -14,7 +15,8 @@ type RitualRow = {
 
 async function readRituals(id?: string): Promise<Ritual[]> {
   const rows = await queryDatabase<RitualRow>(`
-    SELECT rituals.id, rituals.name, rituals.schedule, rituals.archived_at, rituals.skipped_through,
+    SELECT rituals.id, rituals.name, rituals.schedule, rituals.archived_at, rituals.paused,
+      (SELECT MAX(timestamp) FROM ritual_skips WHERE ritual_id = rituals.id) AS skipped_through,
       ritual_reminders.id AS reminder_id, ritual_reminders.time AS reminder_time
     FROM rituals
     LEFT JOIN ritual_reminders ON ritual_reminders.ritual_id = rituals.id
@@ -23,6 +25,7 @@ async function readRituals(id?: string): Promise<Ritual[]> {
   `, id === undefined ? [] : [id])
   const inputs = new Map<string, Omit<RitualInput, 'reminders'> & {
     archivedAt: Ritual['archivedAt']
+    paused: boolean
     skippedThrough: Ritual['skippedThrough']
     reminders: RitualInput['reminders'][number][]
   }>()
@@ -34,6 +37,7 @@ async function readRituals(id?: string): Promise<Ritual[]> {
         name: row.name,
         schedule: JSON.parse(row.schedule),
         archivedAt: row.archived_at,
+        paused: row.paused === 1,
         skippedThrough: row.skipped_through,
         reminders: [],
       }
@@ -47,7 +51,7 @@ async function readRituals(id?: string): Promise<Ritual[]> {
   return Array.from(inputs, ([id, input]) => {
     const result = validateRitualInput(input)
     if (!result.valid) throw new Error('Invalid ritual data in the local database')
-    return { id, archivedAt: input.archivedAt, skippedThrough: input.skippedThrough, ...result.value }
+    return { id, archivedAt: input.archivedAt, paused: input.paused, skippedThrough: input.skippedThrough, ...result.value }
   })
 }
 
@@ -66,12 +70,23 @@ export function deleteRitual(id: string): Promise<void> {
 
 export function skipRitualReminder(id: string, timestamp: number): Promise<void> {
   return writeDatabase(`
-    UPDATE rituals SET skipped_through = ?
-    WHERE id = ? AND archived_at IS NULL AND (skipped_through IS NULL OR skipped_through < ?)
-  `, [timestamp, id, timestamp])
+    INSERT OR IGNORE INTO ritual_skips (ritual_id, timestamp)
+    SELECT id, ? FROM rituals WHERE id = ? AND archived_at IS NULL AND paused = 0
+  `, [timestamp, id])
 }
 
-export async function saveRitual(ritual: Omit<Ritual, 'skippedThrough'>): Promise<void> {
+export function undoRitualSkip(id: string, timestamp: number): Promise<void> {
+  return writeDatabase(`
+    DELETE FROM ritual_skips WHERE ritual_id = ? AND timestamp = ?
+      AND EXISTS (SELECT 1 FROM rituals WHERE id = ? AND archived_at IS NULL AND paused = 0)
+  `, [id, timestamp, id])
+}
+
+export function setRitualPaused(id: string, paused: boolean): Promise<void> {
+  return writeDatabase('UPDATE rituals SET paused = ? WHERE id = ? AND archived_at IS NULL', [Number(paused), id])
+}
+
+export async function saveRitual(ritual: Omit<Ritual, 'skippedThrough' | 'paused'>): Promise<void> {
   const result = validateRitualInput(ritual)
   if (!result.valid) throw new TypeError('Invalid ritual data')
 
