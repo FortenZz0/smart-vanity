@@ -22,7 +22,7 @@ const reminderDate = computed(() => {
 
 <template>
   <article class="ritual-card">
-    <h3 :title="ritual.name">{{ ritual.name }}</h3>
+    <h2 :title="ritual.name">{{ ritual.name }}</h2>
     <span class="ritual-card__reminder">
       <template v-if="reminder">
         {{ reminder.time }}<template v-if="reminderDate"> · {{ reminderDate }}</template>
@@ -46,7 +46,7 @@ const reminderDate = computed(() => {
   background: var(--color-surface);
 }
 
-.ritual-card h3 {
+.ritual-card h2 {
   max-inline-size: 100%;
   margin: 0;
   overflow: hidden;
