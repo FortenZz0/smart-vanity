@@ -8,5 +8,6 @@
     "strict": true,
     "noEmit": true
   },
-  "include": ["**/*.ts", "**/*.vue"]
+  "include": ["**/*.ts", "**/*.vue"],
+  "exclude": ["**/*.stories.ts"]
 }

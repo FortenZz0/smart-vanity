@@ -12,7 +12,9 @@
     "preview": "vite preview --mode mobile",
     "android:init": "npm run build && cap add android",
     "android:open": "cap sync android && cap open android",
-    "android:sync": "cap sync android"
+    "android:sync": "cap sync android",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@capacitor-community/sqlite": "^8.1.1",
@@ -29,6 +31,8 @@
     "@vitejs/plugin-vue": "^6.0.11",
     "typescript": "~5.9.3",
     "vite": "^8.3.2",
-    "vue-tsc": "^3.3.14"
+    "vue-tsc": "^3.3.14",
+    "storybook": "^10.6.8",
+    "@storybook/vue3-vite": "^10.6.8"
   }
 }
