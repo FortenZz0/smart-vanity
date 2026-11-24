@@ -12,6 +12,8 @@ import mirror from '../../../assets/icons/cosmetics/mirror.svg'
 import hairDryerOutline from '../../../assets/icons/cosmetics/hair-dryer-outline.svg'
 import razor from '../../../assets/icons/cosmetics/razor.svg'
 import razorElectric from '../../../assets/icons/cosmetics/razor-electric.svg'
+import pump from '../../../assets/icons/cosmetics/pump.svg'
+import toothbrushPaste from '../../../assets/icons/cosmetics/toothbrush-paste.svg'
 
 const icons = {
   'bottle': bottle,
@@ -28,6 +30,8 @@ const icons = {
   'hair-dryer-outline': hairDryerOutline,
   'razor': razor,
   'razor-electric': razorElectric,
+  'pump': pump,
+  'toothbrush-paste': toothbrushPaste,
 }
 
 type ProductIconId = keyof typeof icons

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import BackupSettings from '../features/backup/BackupSettings.vue'
 import { setUpcomingRitualHours, upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
 import { languages, locale, translate } from '../locales'
 import { theme, themes } from '../theme'
@@ -39,5 +40,6 @@ const draftHours = ref<number | string>(upcomingRitualHours.value)
       >
       <button type="submit" :disabled="draftHours === upcomingRitualHours">{{ translate('save') }}</button>
     </form>
+    <BackupSettings />
   </section>
 </template>

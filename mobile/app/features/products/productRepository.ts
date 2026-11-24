@@ -75,15 +75,26 @@ export function deleteProduct(id: string): Promise<void> {
   return writeDatabase('DELETE FROM products WHERE id = ?', [id])
 }
 
-export function saveProduct(product: Product): Promise<void> {
-  const { expiry } = product
-  const shelfLife = expiry?.kind === 'shelfLife' ? expiry : null
-
-  return writeDatabase(`
+const insertProduct = `
     INSERT INTO products (
       id, name, note, photo_id, icon_id, opened_on, pao_months, expiry_kind, expires_on,
       manufactured_on, shelf_duration, shelf_unit, archived_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`
+
+function productValues(product: Product) {
+  const { expiry } = product
+  const shelfLife = expiry?.kind === 'shelfLife' ? expiry : null
+  return [
+    product.id, product.name, product.note, product.photoId, product.iconId, product.openedOn, product.paoMonths,
+    expiry?.kind ?? null, expiry?.kind === 'date' ? expiry.expiresOn : null,
+    shelfLife?.manufacturedOn ?? null, shelfLife?.duration ?? null, shelfLife?.unit ?? null,
+    product.archivedAt,
+  ]
+}
+
+export function saveProduct(product: Product): Promise<void> {
+  return writeDatabase(`${insertProduct}
     ON CONFLICT(id) DO UPDATE SET
       name = excluded.name,
       note = excluded.note,
@@ -97,10 +108,12 @@ export function saveProduct(product: Product): Promise<void> {
       shelf_duration = excluded.shelf_duration,
       shelf_unit = excluded.shelf_unit,
       archived_at = excluded.archived_at;
-  `, [
-    product.id, product.name, product.note, product.photoId, product.iconId, product.openedOn, product.paoMonths,
-    expiry?.kind ?? null, expiry?.kind === 'date' ? expiry.expiresOn : null,
-    shelfLife?.manufacturedOn ?? null, shelfLife?.duration ?? null, shelfLife?.unit ?? null,
-    product.archivedAt,
-  ])
+  `, productValues(product))
+}
+
+export function insertProductStatement(product: Product) {
+  return {
+    statement: `${insertProduct};`,
+    values: productValues(product),
+  }
 }

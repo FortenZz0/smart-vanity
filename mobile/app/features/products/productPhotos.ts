@@ -6,7 +6,7 @@ function photoFile(id: string) {
   return { path: `product-photos/${id}`, directory: Directory.Data }
 }
 
-function readBase64(photo: Blob): Promise<string> {
+export function readBase64(photo: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
