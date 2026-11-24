@@ -12,6 +12,7 @@
     "preview": "vite preview --mode mobile",
     "android:init": "npm run build && cap add android",
     "android:open": "cap sync android && cap open android",
+    "android:run": "npm run build && cap run android",
     "android:sync": "cap sync android",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"

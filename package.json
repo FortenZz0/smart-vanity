@@ -16,6 +16,7 @@
     "mobile:preview": "npm run preview --workspace mobile --",
     "android:init": "npm run android:init --workspace mobile --",
     "android:open": "npm run android:open --workspace mobile --",
+    "android:run": "npm run android:run --workspace mobile --",
     "anrodi:sync": "npm run android:sync -- workspace mobile --"
   },
   "devDependencies": {
