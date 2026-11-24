@@ -72,7 +72,7 @@ onUnmounted(() => {
         <component :is="Component" :key="currentRoute.path" />
       </RouterView>
     </main>
-    <div v-show="!footerHidden" class="app-footer">
+    <div v-show="!footerHidden" id="app-footer" class="app-footer">
       <FloatingActionButton
         v-if="route.name === 'home'"
         :to="{ name: 'create-product' }"

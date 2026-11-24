@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import ArchiveProductPrompt from '../features/products/ArchiveProductPrompt.vue'
 import ProductCard from '../features/products/ProductCard.vue'
+import { archivePromptSeconds } from '../features/products/archivePromptDuration'
 import { getProductExpiry } from '../features/products/expiry'
 import type { Product } from '../features/products/product'
-import { archiveProduct, getProduct, listProducts, markProductOpened, restoreProduct } from '../features/products/productRepository'
+import { archiveProduct, getProduct, listProducts, markArchivedProductFinished, markProductOpened, restoreProduct } from '../features/products/productRepository'
 import { getNextRitualReminder } from '../features/rituals/nextRitualReminder'
 import type { Ritual } from '../features/rituals/ritual'
 import RitualCard from '../features/rituals/RitualCard.vue'
@@ -20,7 +22,20 @@ const loadState = ref<'loading' | 'ready' | 'error'>('loading')
 const openSections = reactive({ active: true, archived: false })
 const pendingActions = reactive(new Set<string>())
 const actionFailed = ref(false)
-const productActions = { open: markProductOpened, archive: archiveProduct, restore: restoreProduct }
+const productActions = {
+  open: markProductOpened,
+  archive: archiveProduct,
+  restore: restoreProduct,
+  finish: markArchivedProductFinished,
+}
+const archivePrompt = ref<Product | null>(null)
+const promptFocused = ref(false)
+
+watch([archivePrompt, promptFocused], ([product, focused], _, onCleanup) => {
+  if (!product || focused) return
+  const timeout = window.setTimeout(() => { archivePrompt.value = null }, archivePromptSeconds.value * 1000)
+  onCleanup(() => window.clearTimeout(timeout))
+})
 
 const cards = computed(() => products.value.map((product) => {
   const expiry = getProductExpiry(product)
@@ -83,6 +98,10 @@ onMounted(async () => {
 
 onUnmounted(() => window.clearInterval(ritualClock))
 
+function confirmArchivePrompt() {
+  if (archivePrompt.value) return runProductAction(archivePrompt.value, 'finish')
+}
+
 async function runProductAction(product: Product, action: keyof typeof productActions) {
   const { id } = product
   if (pendingActions.has(id)) return
@@ -94,6 +113,12 @@ async function runProductAction(product: Product, action: keyof typeof productAc
     const updated = await getProduct(id)
     const index = products.value.findIndex((item) => item.id === id)
     if (updated && index !== -1) products.value[index] = updated
+    if (action === 'archive' && updated?.archivedAt && !updated.finished) {
+      promptFocused.value = false
+      archivePrompt.value = updated
+    } else if (archivePrompt.value?.id === id && (action === 'finish' || action === 'restore')) {
+      archivePrompt.value = null
+    }
   } catch (error) {
     console.error('Failed to update the local product', error)
     actionFailed.value = true
@@ -174,6 +199,19 @@ async function runProductAction(product: Product, action: keyof typeof productAc
         </template>
       </details>
     </template>
+    <Teleport defer to="#app-footer">
+      <Transition name="archive-product-prompt">
+        <ArchiveProductPrompt
+          v-if="archivePrompt"
+          :key="archivePrompt.id"
+          :product-name="archivePrompt.name"
+          :pending="pendingActions.has(archivePrompt.id)"
+          @confirm="confirmArchivePrompt"
+          @dismiss="archivePrompt = null"
+          @focus-change="promptFocused = $event"
+        />
+      </Transition>
+    </Teleport>
   </div>
 </template>
 

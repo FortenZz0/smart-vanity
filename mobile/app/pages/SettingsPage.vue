@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BackupSettings from '../features/backup/BackupSettings.vue'
+import { archivePromptSeconds, maxArchivePromptSeconds, setArchivePromptSeconds } from '../features/products/archivePromptDuration'
 import { setUpcomingRitualHours, upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
 import { languages, locale, translate } from '../locales'
 import { theme, themes } from '../theme'
 
 const draftHours = ref<number | string>(upcomingRitualHours.value)
+const draftPromptSeconds = ref<number | string>(archivePromptSeconds.value)
 </script>
 
 <template>
@@ -41,5 +43,31 @@ const draftHours = ref<number | string>(upcomingRitualHours.value)
       <button type="submit" :disabled="draftHours === upcomingRitualHours">{{ translate('save') }}</button>
     </form>
     <BackupSettings />
+    <details class="advanced-settings">
+      <summary>{{ translate('advancedSettings') }}</summary>
+      <form @submit.prevent="setArchivePromptSeconds(Number(draftPromptSeconds))">
+        <label for="archive-prompt-seconds">{{ translate('archivePromptDurationSetting') }}</label>
+        <input
+          id="archive-prompt-seconds"
+          v-model.number="draftPromptSeconds"
+          type="number"
+          min="1"
+          :max="maxArchivePromptSeconds"
+          step="1"
+          required
+        >
+        <button type="submit" :disabled="draftPromptSeconds === archivePromptSeconds">{{ translate('save') }}</button>
+      </form>
+    </details>
   </section>
 </template>
+
+<style scoped>
+.advanced-settings {
+  margin-block-start: 1.5rem;
+}
+
+.advanced-settings form {
+  margin-block-start: 0.75rem;
+}
+</style>

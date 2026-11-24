@@ -73,6 +73,13 @@ export function restoreProduct(id: string): Promise<void> {
   return writeDatabase('UPDATE products SET archived_at = NULL WHERE id = ? AND archived_at IS NOT NULL', [id])
 }
 
+export function markArchivedProductFinished(id: string): Promise<void> {
+  return writeDatabase(
+    'UPDATE products SET finished = 1 WHERE id = ? AND archived_at IS NOT NULL AND finished = 0',
+    [id],
+  )
+}
+
 export function deleteProduct(id: string): Promise<void> {
   return writeDatabase('DELETE FROM products WHERE id = ?', [id])
 }
