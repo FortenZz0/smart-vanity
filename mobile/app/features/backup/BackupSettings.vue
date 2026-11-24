@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { translate } from '../../locales'
-import { exportBackup as downloadBackup, importBackup as restoreBackup, InvalidBackupError } from './backup'
+import { exportBackup as downloadBackup, importBackup as restoreBackup, InvalidBackupError, resetBackupData } from './backup'
 
 const backupInput = ref<HTMLInputElement | null>(null)
 const importPhotos = ref(true)
 const importRituals = ref(true)
 const backupBusy = ref(false)
-const backupMessage = ref<'productBackupImported' | 'productBackupInvalid' | 'productBackupImportError' | 'productBackupExportError' | null>(null)
+const backupMessage = ref<
+  'productBackupImported' | 'productBackupInvalid' | 'productBackupImportError' | 'productBackupExportError' |
+  'productBackupResetDone' | 'productBackupResetError' | null
+>(null)
 
 async function exportBackup() {
   if (backupBusy.value) return
@@ -45,6 +48,21 @@ async function importBackup(event: Event) {
     backupBusy.value = false
   }
 }
+
+async function resetBackup() {
+  if (backupBusy.value || !window.confirm(translate('productBackupConfirmReset'))) return
+  backupBusy.value = true
+  backupMessage.value = null
+  try {
+    await resetBackupData()
+    backupMessage.value = 'productBackupResetDone'
+  } catch (error) {
+    console.error('Failed to reset backup data', error)
+    backupMessage.value = 'productBackupResetError'
+  } finally {
+    backupBusy.value = false
+  }
+}
 </script>
 
 <template>
@@ -65,6 +83,9 @@ async function importBackup(event: Event) {
       </button>
       <button type="button" :disabled="backupBusy" @click="backupInput?.click()">
         {{ translate('productBackupImport') }}
+      </button>
+      <button type="button" :disabled="backupBusy" @click="resetBackup">
+        {{ translate('productBackupReset') }}
       </button>
     </div>
     <input ref="backupInput" type="file" accept=".json,application/json" hidden :disabled="backupBusy" @change="importBackup">

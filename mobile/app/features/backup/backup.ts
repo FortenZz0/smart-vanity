@@ -182,6 +182,25 @@ export async function importBackup(json: string, options: { includePhotos: boole
   if (pendingRituals.length) syncRitualNotifications()
 }
 
+export async function resetBackupData(): Promise<void> {
+  const photos = await queryDatabase<{ photo_id: string }>(
+    'SELECT DISTINCT photo_id FROM products WHERE photo_id IS NOT NULL',
+  )
+  await writeDatabaseTransaction([
+    { statement: 'DELETE FROM products;', values: [] },
+    { statement: 'DELETE FROM ritual_reminders;', values: [] },
+    { statement: 'DELETE FROM ritual_skips;', values: [] },
+    { statement: 'DELETE FROM rituals;', values: [] },
+  ])
+  syncRitualNotifications()
+
+  for (const { photo_id } of photos) {
+    await discardUnattachedProductPhoto(photo_id).catch((error: unknown) => {
+      console.error('Failed to clean up a photo after reset', error)
+    })
+  }
+}
+
 async function exportRituals(): Promise<BackupRitual[]> {
   const [rituals, rows] = await Promise.all([
     listRituals(),
