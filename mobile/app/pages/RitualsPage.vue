@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import RitualCard from '../features/rituals/RitualCard.vue'
 import type { Ritual } from '../features/rituals/ritual'
 import { listRituals } from '../features/rituals/ritualRepository'
@@ -9,6 +9,21 @@ const rituals = ref<Ritual[]>([])
 const loadState = ref<'loading' | 'ready' | 'error'>('loading')
 const now = ref(new Date())
 let clock: number | undefined
+
+const sections = computed(() => [
+  {
+    title: 'activeRituals',
+    empty: 'noRituals',
+    open: true,
+    rituals: rituals.value.filter(({ archivedAt }) => archivedAt === null),
+  },
+  {
+    title: 'ritualArchive',
+    empty: 'noArchivedRituals',
+    open: false,
+    rituals: rituals.value.filter(({ archivedAt }) => archivedAt !== null),
+  },
+] as const)
 
 async function loadRituals() {
   loadState.value = 'loading'
@@ -43,12 +58,17 @@ onUnmounted(() => window.clearInterval(clock))
       <p class="rituals__status" role="alert">{{ translate('ritualsLoadError') }}</p>
       <button type="button" @click="loadRituals">{{ translate('tryAgain') }}</button>
     </div>
-    <ul v-else-if="rituals.length" class="rituals__list" role="list">
-      <li v-for="ritual in rituals" :key="ritual.id">
-        <RitualCard :ritual="ritual" :now="now" />
-      </li>
-    </ul>
-    <p v-else class="rituals__status">{{ translate('noRituals') }}</p>
+    <template v-else>
+      <details v-for="section in sections" :key="section.title" :open="section.open">
+        <summary>{{ translate(section.title) }}</summary>
+        <ul v-if="section.rituals.length" class="rituals__list" role="list">
+          <li v-for="ritual in section.rituals" :key="ritual.id">
+            <RitualCard :ritual="ritual" :now="now" />
+          </li>
+        </ul>
+        <p v-else class="rituals__status">{{ translate(section.empty) }}</p>
+      </details>
+    </template>
   </section>
 </template>
 
@@ -60,11 +80,17 @@ onUnmounted(() => window.clearInterval(clock))
   padding-block-end: 4.25rem;
 }
 
+.rituals summary {
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
 .rituals__list {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.625rem;
-  margin: 0;
+  margin: 0.625rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -76,5 +102,9 @@ onUnmounted(() => window.clearInterval(clock))
 
 .rituals__status[role='alert'] {
   margin-block-end: 0.5rem;
+}
+
+.rituals details > .rituals__status {
+  margin-block-start: 0.5rem;
 }
 </style>

@@ -50,4 +50,9 @@ export const migrations: capSQLiteVersionUpgrade[] = [
       );`,
     ],
   },
+  {
+    // Version 3 was used to seed the demo database.
+    toVersion: 4,
+    statements: ['ALTER TABLE rituals ADD COLUMN archived_at TEXT;'],
+  },
 ]

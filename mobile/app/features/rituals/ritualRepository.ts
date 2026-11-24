@@ -6,26 +6,28 @@ type RitualRow = {
   id: string
   name: string
   schedule: string
+  archived_at: string | null
   reminder_id: string | null
   reminder_time: string | null
 }
 
 export async function listRituals(): Promise<Ritual[]> {
   const rows = await queryDatabase<RitualRow>(`
-    SELECT rituals.id, rituals.name, rituals.schedule,
+    SELECT rituals.id, rituals.name, rituals.schedule, rituals.archived_at,
       ritual_reminders.id AS reminder_id, ritual_reminders.time AS reminder_time
     FROM rituals
     LEFT JOIN ritual_reminders ON ritual_reminders.ritual_id = rituals.id
     ORDER BY rituals.name, rituals.id, ritual_reminders.position
   `)
   const inputs = new Map<string, Omit<RitualInput, 'reminders'> & {
+    archivedAt: Ritual['archivedAt']
     reminders: RitualInput['reminders'][number][]
   }>()
 
   for (const row of rows) {
     let input = inputs.get(row.id)
     if (!input) {
-      input = { name: row.name, schedule: JSON.parse(row.schedule), reminders: [] }
+      input = { name: row.name, schedule: JSON.parse(row.schedule), archivedAt: row.archived_at, reminders: [] }
       inputs.set(row.id, input)
     }
     if (row.reminder_id !== null && row.reminder_time !== null) {
@@ -36,11 +38,11 @@ export async function listRituals(): Promise<Ritual[]> {
   return Array.from(inputs, ([id, input]) => {
     const result = validateRitualInput(input)
     if (!result.valid) throw new Error('Invalid ritual data in the local database')
-    return { id, ...result.value }
+    return { id, archivedAt: input.archivedAt, ...result.value }
   })
 }
 
-export async function saveRitual(ritual: Ritual): Promise<void> {
+export async function saveRitual(ritual: Omit<Ritual, 'archivedAt'>): Promise<void> {
   const result = validateRitualInput(ritual)
   if (!result.valid) throw new TypeError('Invalid ritual data')
 

@@ -27,3 +27,14 @@ export const demoRituals = [
     ('demo-ritual-09', 'morning', '07:45', 0),
     ('demo-ritual-10', 'morning', '10:30', 0);`,
 ]
+
+export const demoArchivedRituals = [
+  `INSERT INTO rituals (id, name, schedule, archived_at) VALUES
+    ('demo-ritual-11', 'Вечерняя ванночка для рук', '{"kind":"daily"}', datetime('now', '-2 days')),
+    ('demo-ritual-12', 'Глиняная маска', '{"kind":"weekly","weekdays":[7]}', datetime('now', '-7 days')),
+    ('demo-ritual-13', 'Массаж лица', '{"kind":"weekly","weekdays":[1,4]}', datetime('now', '-14 days'));`,
+  `INSERT INTO ritual_reminders (ritual_id, id, time, position) VALUES
+    ('demo-ritual-11', 'evening', '21:00', 0),
+    ('demo-ritual-12', 'evening', '19:30', 0),
+    ('demo-ritual-13', 'morning', '08:15', 0);`,
+]

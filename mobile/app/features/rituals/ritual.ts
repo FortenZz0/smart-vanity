@@ -30,6 +30,7 @@ export type RitualReminder = {
 export type Ritual = {
   id: string
   name: string
+  archivedAt: string | null
   schedule: RitualSchedule
   // При создании ритуала список начинается с одного напоминания.
   reminders: readonly [RitualReminder, ...RitualReminder[]]

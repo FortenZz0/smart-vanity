@@ -4,6 +4,7 @@ import type { Ritual } from './ritual'
 
 const ritual: Ritual = {
   id: 'demo',
+  archivedAt: null,
   name: 'Утренний уход',
   schedule: { kind: 'daily' },
   reminders: [{ id: 'morning', time: '08:30' }],

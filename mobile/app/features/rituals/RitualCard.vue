@@ -8,7 +8,9 @@ const props = withDefaults(defineProps<{ ritual: Ritual; now?: Date }>(), {
   now: () => new Date(),
 })
 
-const reminder = computed(() => getNextRitualReminder(props.ritual, props.now))
+const reminder = computed(() => props.ritual.archivedAt === null
+  ? getNextRitualReminder(props.ritual, props.now)
+  : null)
 const reminderDate = computed(() => {
   const next = reminder.value
   if (!next || next.daysUntil === 0) return ''
@@ -23,7 +25,7 @@ const reminderDate = computed(() => {
 <template>
   <article class="ritual-card">
     <h2 :title="ritual.name">{{ ritual.name }}</h2>
-    <span class="ritual-card__reminder">
+    <span v-if="ritual.archivedAt === null" class="ritual-card__reminder">
       <template v-if="reminder">
         {{ reminder.time }}<template v-if="reminderDate"> · {{ reminderDate }}</template>
       </template>
