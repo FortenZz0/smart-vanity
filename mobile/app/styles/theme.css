@@ -1,5 +1,6 @@
 :root {
   color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
   --color-bg: #fbf2eb;
   --color-surface: #ffffff;
   --color-text: #2d2024;
