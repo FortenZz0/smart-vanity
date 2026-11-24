@@ -7,6 +7,7 @@ import restoreIcon from '../../../assets/icons/unarchive.svg'
 import { locale, translate } from '../../locales'
 import type { ProductExpiry } from './expiry'
 import type { Product } from './product'
+import ProductIcon from './ProductIcon.vue'
 import { getProductPhoto } from './productPhotos'
 
 const props = defineProps<{
@@ -77,7 +78,7 @@ const expiryLabel = computed(() => {
   <article class="product-card" :class="`product-card--${layout}`">
     <div class="product-card__photo">
       <img v-if="photoUrl" :src="photoUrl" alt="" loading="lazy" @error="photoUrl = null">
-      <span v-else>{{ translate('noProductPhoto') }}</span>
+      <ProductIcon v-else :icon-id="product.iconId" />
     </div>
     <div class="product-card__body">
       <h3 :title="product.name">

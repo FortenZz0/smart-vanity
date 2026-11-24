@@ -19,6 +19,7 @@ export type Product = {
   name: string
   note: string
   photoId: string | null
+  iconId: string | null
   openedOn: CalendarDate | null
   paoMonths: number | null
   expiry: ExpiryInput | null

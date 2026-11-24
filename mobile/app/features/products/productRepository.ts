@@ -7,6 +7,7 @@ type ProductRow = {
   name: string
   note: string
   photo_id: string | null
+  icon_id: string | null
   opened_on: CalendarDate | null
   pao_months: number | null
   archived_at: string | null
@@ -34,6 +35,7 @@ function toProduct(row: ProductRow): Product {
     name: row.name,
     note: row.note,
     photoId: row.photo_id,
+    iconId: row.icon_id,
     openedOn: row.opened_on,
     paoMonths: row.pao_months,
     expiry,
@@ -79,13 +81,14 @@ export function saveProduct(product: Product): Promise<void> {
 
   return writeDatabase(`
     INSERT INTO products (
-      id, name, note, photo_id, opened_on, pao_months, expiry_kind, expires_on,
+      id, name, note, photo_id, icon_id, opened_on, pao_months, expiry_kind, expires_on,
       manufactured_on, shelf_duration, shelf_unit, archived_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(id) DO UPDATE SET
       name = excluded.name,
       note = excluded.note,
       photo_id = excluded.photo_id,
+      icon_id = excluded.icon_id,
       opened_on = excluded.opened_on,
       pao_months = excluded.pao_months,
       expiry_kind = excluded.expiry_kind,
@@ -95,7 +98,7 @@ export function saveProduct(product: Product): Promise<void> {
       shelf_unit = excluded.shelf_unit,
       archived_at = excluded.archived_at;
   `, [
-    product.id, product.name, product.note, product.photoId, product.openedOn, product.paoMonths,
+    product.id, product.name, product.note, product.photoId, product.iconId, product.openedOn, product.paoMonths,
     expiry?.kind ?? null, expiry?.kind === 'date' ? expiry.expiresOn : null,
     shelfLife?.manufacturedOn ?? null, shelfLife?.duration ?? null, shelfLife?.unit ?? null,
     product.archivedAt,

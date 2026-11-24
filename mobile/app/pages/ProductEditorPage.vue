@@ -4,6 +4,8 @@ import { RouterLink, useRouter } from 'vue-router'
 import EditorActions from '../components/EditorActions.vue'
 import { getProductExpiry, parseCalendarDate } from '../features/products/expiry'
 import type { ExpiryInput, Product, ShelfLifeUnit } from '../features/products/product'
+import ProductIcon from '../features/products/ProductIcon.vue'
+import { defaultProductIcon, productIconIds } from '../features/products/productIcons'
 import { discardUnattachedProductPhoto, getProductPhoto, saveProductPhoto } from '../features/products/productPhotos'
 import { deleteProduct, getProduct, saveProduct } from '../features/products/productRepository'
 import { locale, translate } from '../locales'
@@ -22,6 +24,8 @@ const manufacturedOn = ref('')
 const shelfDuration = ref<number | ''>('')
 const shelfUnit = ref<ShelfLifeUnit>('months')
 const photoInput = ref<HTMLInputElement | null>(null)
+const iconPicker = ref<HTMLDialogElement | null>(null)
+const iconId = ref<string | null>(null)
 const photo = shallowRef<File | null>(null)
 const storedPhotoId = ref<string | null>(null)
 const photoUrl = ref<string | null>(null)
@@ -50,6 +54,7 @@ async function loadProduct() {
     openedOn.value = product.openedOn ?? ''
     paoMonths.value = product.paoMonths ?? ''
     storedPhotoId.value = product.photoId
+    iconId.value = product.iconId
     const expiry = product.expiry
     if (expiry?.kind === 'date') expiresOn.value = expiry.expiresOn
     if (expiry?.kind === 'shelfLife') {
@@ -107,6 +112,11 @@ function removePhoto() {
   photo.value = null
   storedPhotoId.value = null
   photoFailed.value = false
+}
+
+function selectIcon(id: string) {
+  iconId.value = id
+  iconPicker.value?.close()
 }
 
 function failPhotoPreview() {
@@ -216,6 +226,7 @@ async function submitProduct(event: SubmitEvent) {
       name: name.value,
       note: note.value,
       photoId,
+      iconId: iconId.value,
       ...expiry.fields,
       archivedAt,
     })
@@ -251,13 +262,7 @@ async function submitProduct(event: SubmitEvent) {
     <form v-else class="product-form" @submit.prevent="submitProduct">
       <div class="product-form__photo">
         <div class="product-form__photo-control">
-          <button
-            type="button"
-            class="product-form__preview"
-            :aria-label="translate(hasPhoto ? 'replaceProductPhoto' : 'chooseProductPhoto')"
-            :disabled="saving"
-            @click="photoInput?.click()"
-          >
+          <div class="product-form__preview">
             <img
               v-if="photoUrl"
               :key="photoUrl"
@@ -266,8 +271,8 @@ async function submitProduct(event: SubmitEvent) {
               @load="photoLoading = false"
               @error="failPhotoPreview"
             >
-            <span v-else>{{ translate('noProductPhoto') }}</span>
-          </button>
+            <ProductIcon v-else :icon-id="iconId" />
+          </div>
           <button
             v-if="hasPhoto"
             class="product-form__remove-photo"
@@ -279,6 +284,35 @@ async function submitProduct(event: SubmitEvent) {
             <span aria-hidden="true">×</span>
           </button>
         </div>
+        <div class="product-form__photo-actions">
+          <button type="button" :disabled="saving" @click="iconPicker?.showModal()">
+            {{ translate('chooseProductIcon') }}
+          </button>
+          <button type="button" :disabled="saving" @click="photoInput?.click()">
+            {{ translate(hasPhoto ? 'replaceProductPhoto' : 'chooseProductPhoto') }}
+          </button>
+        </div>
+        <dialog ref="iconPicker" class="product-form__icon-picker" aria-labelledby="product-icon-title">
+          <div class="product-form__icon-picker-header">
+            <h2 id="product-icon-title">{{ translate('chooseProductIcon') }}</h2>
+            <button type="button" @click="iconPicker?.close()">
+              {{ translate('closeProductIconPicker') }}
+            </button>
+          </div>
+          <p v-if="hasPhoto">{{ translate('productIconPhotoHint') }}</p>
+          <div class="product-form__icon-grid">
+            <button
+              v-for="id in productIconIds"
+              :key="id"
+              type="button"
+              :aria-label="translate(`productIcon.${id}`)"
+              :aria-pressed="id === (iconId ?? defaultProductIcon)"
+              @click="selectIcon(id)"
+            >
+              <ProductIcon :icon-id="id" />
+            </button>
+          </div>
+        </dialog>
         <input ref="photoInput" type="file" accept="image/*" hidden :disabled="saving" @change="selectPhoto">
         <p v-if="photoFailed" role="alert">{{ translate('productPhotoError') }}</p>
       </div>
@@ -390,8 +424,6 @@ async function submitProduct(event: SubmitEvent) {
   border-radius: 0.625rem;
   background: var(--color-photo-placeholder);
   color: var(--color-text-muted);
-  cursor: pointer;
-  font: inherit;
 }
 
 .product-form__preview img {
@@ -416,6 +448,70 @@ async function submitProduct(event: SubmitEvent) {
   color: var(--color-text);
   cursor: pointer;
   font: inherit;
+}
+
+.product-form__photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.product-form__photo-actions button,
+.product-form__icon-picker button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-divider);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.product-form__icon-picker {
+  box-sizing: border-box;
+  inline-size: min(22rem, calc(100% - 2rem));
+  border: 1px solid var(--color-divider);
+  border-radius: 0.875rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: start;
+}
+
+.product-form__icon-picker::backdrop {
+  background: rgb(0 0 0 / 45%);
+}
+
+.product-form__icon-picker-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-end: 0.75rem;
+}
+
+.product-form__icon-picker-header h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.product-form__icon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.product-form__icon-grid button {
+  display: grid;
+  min-block-size: 2.75rem;
+  aspect-ratio: 1;
+  place-items: center;
+  padding: 0;
+}
+
+.product-form__icon-grid button[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-selected-bg);
 }
 
 .product-form__fields {

@@ -72,4 +72,8 @@ export const migrations: capSQLiteVersionUpgrade[] = [
       SELECT id, skipped_through FROM rituals WHERE skipped_through IS NOT NULL;`,
     ],
   },
+  {
+    toVersion: 7,
+    statements: ['ALTER TABLE products ADD COLUMN icon_id TEXT;'],
+  },
 ]
