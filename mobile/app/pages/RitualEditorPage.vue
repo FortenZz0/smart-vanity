@@ -271,7 +271,9 @@ async function submitRitual(event: SubmitEvent) {
   gap: 0.375rem;
 }
 
-.ritual-form :is(input:not([type='checkbox']), select, button) {
+.ritual-form input:not([type='checkbox']),
+.ritual-form select,
+.ritual-form__reminders button {
   min-inline-size: 0;
   min-block-size: 2.75rem;
   box-sizing: border-box;
