@@ -2,12 +2,21 @@ import type { Ritual } from './ritual'
 
 const millisecondsPerDay = 86_400_000
 
-export function getNextRitualReminder({ schedule, reminders }: Ritual, now: Date) {
-  // Use UTC for calendar arithmetic so a local day always counts as one day.
+function localCalendarDay(time: Date): Date {
   const today = new Date(0)
-  today.setUTCFullYear(now.getFullYear(), now.getMonth(), now.getDate())
-  const currentMinute = now.getHours() * 60 + now.getMinutes()
-    + (now.getSeconds() * 1000 + now.getMilliseconds()) / 60_000
+  today.setUTCFullYear(time.getFullYear(), time.getMonth(), time.getDate())
+  return today
+}
+
+export function getNextRitualReminder(
+  { schedule, reminders, skippedThrough }: Ritual,
+  now: Date,
+) {
+  const from = skippedThrough !== null && skippedThrough >= now.getTime() ? new Date(skippedThrough + 1) : now
+  // Use UTC for calendar arithmetic so a local day always counts as one day.
+  const today = localCalendarDay(from)
+  const currentMinute = from.getHours() * 60 + from.getMinutes()
+    + (from.getSeconds() * 1000 + from.getMilliseconds()) / 60_000
 
   const times = reminders.map(({ time }) => time).sort()
   const timeToday = times.find((time) => {
@@ -33,5 +42,14 @@ export function getNextRitualReminder({ schedule, reminders }: Ritual, now: Date
   const time = daysUntil === 0 ? timeToday : times[0]
   if (!time || !Number.isFinite(date.getTime())) return null
 
-  return { date, daysUntil, time }
+  const [hours, minutes] = time.split(':').map(Number)
+  const localTime = new Date(from)
+  localTime.setFullYear(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  const timestamp = localTime.setHours(hours, minutes, 0, 0)
+  return {
+    date,
+    daysUntil: (date.getTime() - localCalendarDay(now).getTime()) / millisecondsPerDay,
+    time,
+    timestamp,
+  }
 }

@@ -27,6 +27,8 @@
   "ritualWeekdays": "Days of the week",
   "ritualReminders": "Reminders",
   "ritualReminderTime": "Reminder time",
+  "skipRitualReminder": "Skip the next reminder",
+  "ritualSkipError": "Could not skip the reminder. Try again.",
   "ritualNotificationBody": "Time for your ritual",
   "ritualTomorrow": "tomorrow",
   "ritualNextReminderUnavailable": "No upcoming reminder",

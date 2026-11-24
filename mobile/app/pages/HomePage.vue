@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
-import { RouterLink } from 'vue-router'
 import ProductCard from '../features/products/ProductCard.vue'
 import { getProductExpiry } from '../features/products/expiry'
 import type { Product } from '../features/products/product'
@@ -42,10 +41,7 @@ const upcomingRituals = computed(() => {
     const next = getNextRitualReminder(ritual, now.value)
     if (!next) return []
 
-    const [hours, minutes] = next.time.split(':').map(Number)
-    const localDate = new Date(currentTime)
-    localDate.setFullYear(next.date.getUTCFullYear(), next.date.getUTCMonth(), next.date.getUTCDate())
-    const timestamp = localDate.setHours(hours, minutes, 0, 0)
+    const { timestamp } = next
     return timestamp >= currentTime && timestamp <= cutoff ? [{ ritual, timestamp }] : []
   }).sort((a, b) => a.timestamp - b.timestamp)
 })
@@ -143,9 +139,12 @@ async function runProductAction(product: Product, action: keyof typeof productAc
       <summary><h2>{{ translate('upcomingRituals') }}</h2></summary>
       <ul class="home__list" role="list">
         <li v-for="{ ritual } in upcomingRituals" :key="ritual.id">
-          <RouterLink class="home__ritual-link" :to="{ name: 'edit-ritual', params: { ritualId: ritual.id } }">
-            <RitualCard :ritual="ritual" :now="now" />
-          </RouterLink>
+          <RitualCard
+            :ritual="ritual"
+            :now="now"
+            interactive
+            @skipped="ritual.skippedThrough = $event"
+          />
         </li>
       </ul>
     </details>
@@ -227,12 +226,5 @@ async function runProductAction(product: Product, action: keyof typeof productAc
   flex: 0 0 clamp(9rem, 46vw, 12rem);
   min-inline-size: 0;
   scroll-snap-align: start;
-}
-
-.home__ritual-link {
-  display: block;
-  border-radius: 0.875rem;
-  color: inherit;
-  text-decoration: none;
 }
 </style>

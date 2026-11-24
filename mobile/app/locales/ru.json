@@ -27,6 +27,8 @@
   "ritualWeekdays": "Дни недели",
   "ritualReminders": "Напоминания",
   "ritualReminderTime": "Время напоминания",
+  "skipRitualReminder": "Пропустить ближайшее напоминание",
+  "ritualSkipError": "Не удалось пропустить напоминание. Попробуйте ещё раз.",
   "ritualNotificationBody": "Время выполнить ритуал",
   "ritualTomorrow": "завтра",
   "ritualNextReminderUnavailable": "Нет ближайшего напоминания",

@@ -55,4 +55,8 @@ export const migrations: capSQLiteVersionUpgrade[] = [
     toVersion: 4,
     statements: ['ALTER TABLE rituals ADD COLUMN archived_at TEXT;'],
   },
+  {
+    toVersion: 5,
+    statements: ['ALTER TABLE rituals ADD COLUMN skipped_through INTEGER;'],
+  },
 ]

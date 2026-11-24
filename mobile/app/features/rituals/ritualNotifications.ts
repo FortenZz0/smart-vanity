@@ -5,42 +5,50 @@ import { getNextRitualReminder } from './nextRitualReminder'
 import type { Ritual } from './ritual'
 import { listRituals } from './ritualRepository'
 
-const intervalOccurrences = 12
+const scheduledOccurrences = 12
 let pendingSync = Promise.resolve()
+
+function scheduledDates(ritual: Ritual, now: Date): Schedule[] {
+  const dates: Schedule[] = []
+  let after = now
+  for (let index = 0; index < scheduledOccurrences; index++) {
+    const next = getNextRitualReminder(ritual, after)
+    if (!next) break
+    if (next.timestamp > now.getTime()) dates.push({ at: new Date(next.timestamp) })
+    after = new Date(Math.max(after.getTime(), next.timestamp) + 1)
+  }
+  return dates
+}
 
 function reminderSchedules(ritual: Ritual, now: Date): Schedule[] {
   const { schedule } = ritual
+  const hasSkip = ritual.skippedThrough !== null && ritual.skippedThrough >= now.getTime()
   return ritual.reminders.flatMap((reminder): Schedule[] => {
     const [hour, minute] = reminder.time.split(':').map(Number)
     const on = { hour, minute, second: 0 }
-    switch (schedule.kind) {
-      case 'daily':
-        return [{ on }]
-      case 'weekly':
-        return schedule.weekdays.map((day) => ({
-          on: { ...on, weekday: (day % 7 + 1) as Weekday },
-        }))
-      case 'interval': {
-        const dates: Schedule[] = []
-        let after = now
-        for (let index = 0; index < intervalOccurrences; index++) {
-          const next = getNextRitualReminder({ ...ritual, reminders: [reminder] }, after)
-          if (!next) break
-          const at = new Date(after)
-          at.setFullYear(next.date.getUTCFullYear(), next.date.getUTCMonth(), next.date.getUTCDate())
-          at.setHours(hour, minute, 0, 0)
-          if (at > now) dates.push({ at })
-          after = new Date(Math.max(after.getTime(), at.getTime()) + 1)
-        }
-        return dates
+    const singleReminder: Ritual = { ...ritual, reminders: [reminder] }
+    if (schedule.kind === 'interval') return scheduledDates(singleReminder, now)
+    if (schedule.kind === 'daily' && !hasSkip) return [{ on }]
+
+    const weekdays = schedule.kind === 'weekly' ? schedule.weekdays : [1, 2, 3, 4, 5, 6, 7] as const
+    return weekdays.flatMap((day): Schedule[] => {
+      if (hasSkip && ritual.skippedThrough !== null) {
+        const weeklyReminder: Ritual = { ...singleReminder, schedule: { kind: 'weekly', weekdays: [day] } }
+        const next = getNextRitualReminder({ ...weeklyReminder, skippedThrough: null }, now)
+        // Native recurring alarms cannot omit their first occurrence.
+        if (next && next.timestamp <= ritual.skippedThrough) return scheduledDates(weeklyReminder, now)
       }
-    }
+      return [{ on: { ...on, weekday: (day % 7 + 1) as Weekday } }]
+    })
   })
 }
 
 async function reconcileNotifications(requestPermission: boolean): Promise<void> {
   const rituals = (await listRituals()).filter(({ archivedAt }) => archivedAt === null)
-  const { notifications: pending } = await LocalNotifications.getPending()
+  const [{ notifications: pending }, { notifications: delivered }] = await Promise.all([
+    LocalNotifications.getAll({ state: 'SCHEDULED' }),
+    LocalNotifications.getAll({ state: 'TRIGGERED' }),
+  ])
   let { display } = await LocalNotifications.checkPermissions()
   if (display !== 'granted' && requestPermission && rituals.length) {
     ({ display } = await LocalNotifications.requestPermissions())
@@ -54,7 +62,7 @@ async function reconcileNotifications(requestPermission: boolean): Promise<void>
     else existing.set(extra.ritualNotification, id)
   }
 
-  const usedIds = new Set(pending.map(({ id }) => id))
+  const usedIds = new Set([...pending, ...delivered].map(({ id }) => id))
   let nextId = 1
   const body = translate('ritualNotificationBody')
   const now = new Date()
