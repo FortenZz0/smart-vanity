@@ -139,7 +139,7 @@ async function runProductAction(product: Product, action: keyof typeof productAc
       </section>
     </template>
 
-    <details v-if="upcomingRituals.length" open>
+    <details v-if="upcomingRituals.length">
       <summary><h2>{{ translate('upcomingRituals') }}</h2></summary>
       <ul class="home__list" role="list">
         <li v-for="{ ritual } in upcomingRituals" :key="ritual.id">
