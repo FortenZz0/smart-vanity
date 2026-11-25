@@ -51,8 +51,7 @@ function clearSearch() {
 }
 
 function collapseOnBlur(event: FocusEvent) {
-  if (!hasQuery.value && event.relatedTarget instanceof Node &&
-      !(event.currentTarget as HTMLElement).contains(event.relatedTarget)) {
+  if (!(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)) {
     expanded.value = false
   }
 }
@@ -88,13 +87,13 @@ function openFirstResult() {
         @focus="expanded = true"
         @input="expanded = true"
       >
-      <button v-if="query" type="button" :aria-label="translate('homeSearchClear')" @click="clearSearch">
+      <button v-if="query" type="button" :aria-label="translate('homeSearchClear')" @mousedown.prevent @click="clearSearch">
         <span aria-hidden="true">×</span>
       </button>
     </div>
     <div v-if="expanded" class="home-search__panel">
       <div v-if="!parsedQuery.scope" class="home-search__qualifiers">
-        <button v-for="{ scope, label } in qualifiers" :key="scope" type="button" @click="setScope(scope)">
+        <button v-for="{ scope, label } in qualifiers" :key="scope" type="button" @mousedown.prevent @click="setScope(scope)">
           <code>{{ scope }}:</code> {{ translate(label) }}
         </button>
       </div>
@@ -103,7 +102,7 @@ function openFirstResult() {
           <h2>{{ translate(label) }}</h2>
           <ul>
             <li v-for="{ id, name, archivedAt, to } in items" :key="id">
-              <RouterLink :to="to">
+              <RouterLink :to="to" @mousedown.prevent>
                 <span>{{ name }}</span>
                 <small v-if="archivedAt">{{ translate('homeSearchArchived') }}</small>
               </RouterLink>
@@ -119,6 +118,10 @@ function openFirstResult() {
 </template>
 
 <style scoped>
+.home-search {
+  position: relative;
+}
+
 .home-search__field {
   display: flex;
   border: 1px solid var(--color-divider);
@@ -157,6 +160,10 @@ function openFirstResult() {
 }
 
 .home-search__panel {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline: 0;
+  z-index: 2;
   margin-block-start: 0.375rem;
   padding: 0.5rem;
   border: 1px solid var(--color-divider);
