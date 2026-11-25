@@ -119,6 +119,7 @@
   "productLoadError": "Could not load the product",
   "productName": "Product name",
   "productFinished": "Used up",
+  "productUnopened": "Unopened",
   "archiveProductFinishedPrompt": "Did you use up {name}?",
   "archiveProductFinishedYes": "Yes",
   "dismissArchiveProductPrompt": "Dismiss notification",

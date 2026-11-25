@@ -64,6 +64,8 @@ watch(() => props.product.photoId, async (id, _previous, onCleanup) => {
 }, { immediate: true })
 
 const expiryLabel = computed(() => {
+  if (props.product.finished) return translate('productFinished')
+
   const expiry = props.expiry
   if (expiry.status === 'unknown') return translate('expiryUnknown')
   if (expiry.status === 'expired') return translate('expiryExpired')
@@ -93,12 +95,14 @@ const expiryLabel = computed(() => {
           {{ product.name }}
         </RouterLink>
       </h3>
-      <span
-        class="product-card__expiry"
-        :class="expiryClass"
-      >
-        {{ product.finished ? translate('productFinished') : expiryLabel }}
-      </span>
+      <div class="product-card__badges">
+        <span class="product-card__badge" :class="expiryClass" :title="expiryLabel">
+          {{ expiryLabel }}
+        </span>
+        <span v-if="layout === 'row' && product.openedOn === null" class="product-card__badge product-card__badge--unopened">
+          {{ translate('productUnopened') }}
+        </span>
+      </div>
     </div>
     <button
       v-if="layout === 'row' || product.archivedAt === null"
@@ -238,10 +242,16 @@ const expiryLabel = computed(() => {
   white-space: nowrap;
 }
 
-.product-card__expiry {
+.product-card__badges {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: min(0.375rem, 4cqi);
+}
+
+.product-card__badge {
   display: inline-block;
   box-sizing: border-box;
-  max-inline-size: 100%;
+  min-inline-size: 0;
   overflow: hidden;
   padding: 0.25rem 0.5rem;
   padding-inline: min(0.5rem, 5cqi);
@@ -253,6 +263,10 @@ const expiryLabel = computed(() => {
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.product-card__badge--unopened {
+  flex-shrink: 0;
 }
 
 .product-card__expiry--warning {

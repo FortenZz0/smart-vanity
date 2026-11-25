@@ -119,6 +119,7 @@
   "productLoadError": "Не удалось загрузить товар",
   "productName": "Название товара",
   "productFinished": "Кончился",
+  "productUnopened": "Закрыт",
   "archiveProductFinishedPrompt": "{name} закончился?",
   "archiveProductFinishedYes": "Да",
   "dismissArchiveProductPrompt": "Закрыть уведомление",
