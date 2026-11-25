@@ -63,18 +63,23 @@ function readPhoto(value: unknown): BackupPhoto | null {
 function readProduct(value: unknown): BackupProduct {
   if (!isRecord(value)) return invalidBackup()
   const { id, name, note, iconId, openedOn, paoMonths, expiry, archivedAt, photo, finished = false } = value
+  const { createdAt = null, updatedAt = null } = value
   if (typeof id !== 'string' || !id.trim() || typeof name !== 'string' || !name.trim() ||
       typeof note !== 'string' || (iconId !== null && typeof iconId !== 'string') ||
       (paoMonths !== null && !isPositiveInteger(paoMonths)) || typeof finished !== 'boolean' ||
-      (archivedAt !== null && (typeof archivedAt !== 'string' || !Number.isFinite(Date.parse(archivedAt))))) {
+      !isOptionalTimestamp(archivedAt) || !isOptionalTimestamp(createdAt) || !isOptionalTimestamp(updatedAt)) {
     return invalidBackup()
   }
   return {
-    id, name, note, iconId, paoMonths, archivedAt, finished,
+    id, name, note, iconId, paoMonths, archivedAt, finished, createdAt, updatedAt,
     openedOn: openedOn === null ? null : readDate(openedOn),
     expiry: readExpiry(expiry),
     photo: readPhoto(photo),
   }
+}
+
+function isOptionalTimestamp(value: unknown): value is string | null {
+  return value === null || (typeof value === 'string' && Number.isFinite(Date.parse(value)))
 }
 
 function readRitualSchedule(value: unknown): RitualInput['schedule'] {

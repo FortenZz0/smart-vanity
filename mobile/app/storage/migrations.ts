@@ -80,4 +80,11 @@ export const migrations: capSQLiteVersionUpgrade[] = [
     toVersion: 8,
     statements: ['ALTER TABLE products ADD COLUMN finished INTEGER NOT NULL DEFAULT 0 CHECK (finished IN (0, 1));'],
   },
+  {
+    toVersion: 9,
+    statements: [
+      'ALTER TABLE products ADD COLUMN created_at TEXT;',
+      'ALTER TABLE products ADD COLUMN updated_at TEXT;',
+    ],
+  },
 ]

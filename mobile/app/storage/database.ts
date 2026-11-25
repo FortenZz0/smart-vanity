@@ -31,7 +31,7 @@ async function openDatabase(): Promise<SQLiteDBConnection> {
           { ...migration, statements: [...migration.statements, ...demoArchivedRituals] },
         ]
       }
-      if (migration.toVersion === 8) {
+      if (migration.toVersion === 9) {
         return [{ ...migration, statements: [...migration.statements, ...demoProducts] }]
       }
       return [migration]

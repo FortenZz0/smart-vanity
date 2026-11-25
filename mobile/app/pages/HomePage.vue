@@ -2,10 +2,12 @@
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import ArchiveProductPrompt from '../features/products/ArchiveProductPrompt.vue'
 import ProductCard from '../features/products/ProductCard.vue'
+import ProductListOptions from '../features/products/ProductListOptions.vue'
 import { archivePromptSeconds } from '../features/products/archivePromptDuration'
 import { getProductExpiry } from '../features/products/expiry'
 import { expiryWarningDays } from '../features/products/expiryWarningDays'
 import type { Product } from '../features/products/product'
+import { arrangeProducts, type ProductFilter, type ProductSort } from '../features/products/productListOptions'
 import { archiveProduct, getProduct, listProducts, markArchivedProductFinished, markProductOpened, restoreProduct } from '../features/products/productRepository'
 import { getNextRitualReminder } from '../features/rituals/nextRitualReminder'
 import type { Ritual } from '../features/rituals/ritual'
@@ -13,13 +15,15 @@ import RitualCard from '../features/rituals/RitualCard.vue'
 import { listRituals } from '../features/rituals/ritualRepository'
 import { upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
 import HomeSearch from '../features/search/HomeSearch.vue'
-import { translate } from '../locales'
+import { locale, translate } from '../locales'
 
 const rituals = ref<Ritual[]>([])
 const ritualsLoading = ref(true)
 const now = ref(new Date())
 let ritualClock: number | undefined
 const products = ref<Product[]>([])
+const productFilter = ref<ProductFilter>('all')
+const productSort = ref<ProductSort>('default')
 const loadState = ref<'loading' | 'ready' | 'error'>('loading')
 const openSections = reactive({ active: true, archived: false })
 const pendingActions = reactive(new Set<string>())
@@ -64,7 +68,12 @@ const upcomingRituals = computed(() => {
 })
 
 const sections = computed(() => [
-  { key: 'active', title: 'myProducts', empty: 'noActiveProducts', cards: active.value },
+  {
+    key: 'active',
+    title: 'myProducts',
+    empty: active.value.length && productFilter.value !== 'all' ? 'noFilteredProducts' : 'noActiveProducts',
+    cards: arrangeProducts(active.value, productFilter.value, productSort.value, locale.value),
+  },
   {
     key: 'archived',
     title: 'productArchive',
@@ -180,29 +189,32 @@ async function runProductAction(product: Product, action: keyof typeof productAc
     </details>
 
     <template v-if="loadState === 'ready'">
-      <details
-        v-for="section in sections"
-        :key="section.key"
-        :open="openSections[section.key]"
-        @toggle="openSections[section.key] = ($event.currentTarget as HTMLDetailsElement).open"
-      >
-        <summary><h2>{{ translate(section.title) }}</h2></summary>
-        <template v-if="openSections[section.key]">
-          <ul v-if="section.cards.length" class="home__list">
-            <li v-for="card in section.cards" :key="card.product.id">
-              <ProductCard
-                :product="card.product"
-                :expiry="card.expiry"
-                :expiring-soon="card.expiringSoon"
-                :action-pending="pendingActions.has(card.product.id)"
-                layout="row"
-                @quick-action="runProductAction(card.product, $event)"
-              />
-            </li>
-          </ul>
-          <p v-else class="home__status">{{ translate(section.empty) }}</p>
-        </template>
-      </details>
+      <div v-for="section in sections" :key="section.key" class="home__products-section">
+        <details
+          :open="openSections[section.key]"
+          @toggle="openSections[section.key] = ($event.currentTarget as HTMLDetailsElement).open"
+        >
+          <summary :class="{ 'home__products-summary--with-options': section.key === 'active' }">
+            <h2>{{ translate(section.title) }}</h2>
+          </summary>
+          <template v-if="openSections[section.key]">
+            <ul v-if="section.cards.length" class="home__list">
+              <li v-for="card in section.cards" :key="card.product.id">
+                <ProductCard
+                  :product="card.product"
+                  :expiry="card.expiry"
+                  :expiring-soon="card.expiringSoon"
+                  :action-pending="pendingActions.has(card.product.id)"
+                  layout="row"
+                  @quick-action="runProductAction(card.product, $event)"
+                />
+              </li>
+            </ul>
+            <p v-else class="home__status">{{ translate(section.empty) }}</p>
+          </template>
+        </details>
+        <ProductListOptions v-if="section.key === 'active'" v-model:filter="productFilter" v-model:sort="productSort" />
+      </div>
     </template>
     <Teleport defer to="#app-footer">
       <Transition name="archive-product-prompt">
@@ -239,6 +251,17 @@ async function runProductAction(product: Product, action: keyof typeof productAc
 
 .home summary h2 {
   display: inline;
+}
+
+.home__products-section {
+  position: relative;
+}
+
+.home__products-summary--with-options {
+  box-sizing: border-box;
+  min-block-size: 2.75rem;
+  padding-block: 0.625rem;
+  padding-inline-end: 3.25rem;
 }
 
 .home__status {

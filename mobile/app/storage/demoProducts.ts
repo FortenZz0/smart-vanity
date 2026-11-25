@@ -1,6 +1,6 @@
 // Сроки считаются от даты установки демоданных.
 export const demoProducts = [
-  `INSERT OR IGNORE INTO products (id, name, note, icon_id, expiry_kind, expires_on, archived_at)
+  `INSERT OR IGNORE INTO products (id, name, note, icon_id, expiry_kind, expires_on, archived_at, created_at, updated_at)
   WITH samples(id, name, icon_id, expires_in_days, archived_days_ago) AS (
     VALUES
       (1, 'Сыворотка с витамином C', 'eyedropper', 10, NULL),
@@ -31,11 +31,13 @@ export const demoProducts = [
     icon_id,
     CASE WHEN expires_in_days IS NOT NULL THEN 'date' END,
     CASE WHEN expires_in_days IS NOT NULL THEN date('now', 'localtime', printf('%+d days', expires_in_days)) END,
-    CASE WHEN archived_days_ago IS NOT NULL THEN strftime('%Y-%m-%dT%H:%M:%fZ', 'now', printf('-%d days', archived_days_ago)) END
+    CASE WHEN archived_days_ago IS NOT NULL THEN strftime('%Y-%m-%dT%H:%M:%fZ', 'now', printf('-%d days', archived_days_ago)) END,
+    strftime('%Y-%m-%dT%H:%M:%fZ', 'now', printf('-%d days', 200 + id)),
+    strftime('%Y-%m-%dT%H:%M:%fZ', 'now', printf('-%d days', id % 11))
   FROM samples;`,
   `INSERT OR IGNORE INTO products (
     id, name, note, icon_id, opened_on, pao_months, expiry_kind, expires_on,
-    manufactured_on, shelf_duration, shelf_unit, archived_at, finished
+    manufactured_on, shelf_duration, shelf_unit, archived_at, finished, created_at, updated_at
   )
   WITH samples(
     id, name, note, icon_id, opened_days_ago, pao_months, expires_in_days,
@@ -62,6 +64,8 @@ export const demoProducts = [
     CASE WHEN manufactured_days_ago IS NOT NULL THEN date('now', 'localtime', printf('-%d days', manufactured_days_ago)) END,
     shelf_duration, shelf_unit,
     CASE WHEN archived_days_ago IS NOT NULL THEN strftime('%Y-%m-%dT%H:%M:%fZ', 'now', printf('-%d days', archived_days_ago)) END,
-    finished
+    finished,
+    strftime('%Y-%m-%dT%H:%M:%fZ', 'now', printf('-%d days', 200 + id)),
+    strftime('%Y-%m-%dT%H:%M:%fZ', 'now', printf('-%d days', id % 11))
   FROM samples;`,
 ]

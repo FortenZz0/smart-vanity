@@ -24,5 +24,7 @@ export type Product = {
   paoMonths: number | null
   expiry: ExpiryInput | null
   finished: boolean
+  createdAt: string | null
+  updatedAt: string | null
   archivedAt: string | null // Момент переноса в архив в ISO 8601 (UTC).
 }
