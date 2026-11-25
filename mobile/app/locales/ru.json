@@ -54,6 +54,7 @@
   "demoResetDone": "Демоданные установлены.",
   "demoResetError": "Не удалось установить демоданные.",
   "advancedSettings": "Расширенные настройки",
+  "expiryWarningDaysSetting": "Предупреждать за сколько дней до истечения срока",
   "archivePromptDurationSetting": "Время показа вопроса после архивирования, сек.",
   "productBackup": "Данные",
   "productBackupDescription": "Импорт только добавляет отсутствующие записи..",

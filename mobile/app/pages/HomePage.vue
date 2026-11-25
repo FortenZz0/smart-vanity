@@ -4,6 +4,7 @@ import ArchiveProductPrompt from '../features/products/ArchiveProductPrompt.vue'
 import ProductCard from '../features/products/ProductCard.vue'
 import { archivePromptSeconds } from '../features/products/archivePromptDuration'
 import { getProductExpiry } from '../features/products/expiry'
+import { expiryWarningDays } from '../features/products/expiryWarningDays'
 import type { Product } from '../features/products/product'
 import { archiveProduct, getProduct, listProducts, markArchivedProductFinished, markProductOpened, restoreProduct } from '../features/products/productRepository'
 import { getNextRitualReminder } from '../features/rituals/nextRitualReminder'
@@ -13,7 +14,6 @@ import { listRituals } from '../features/rituals/ritualRepository'
 import { upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
 import { translate } from '../locales'
 
-const soonThresholdDays = 30
 const rituals = ref<Ritual[]>([])
 const now = ref(new Date())
 let ritualClock: number | undefined
@@ -40,7 +40,7 @@ watch([archivePrompt, promptFocused], ([product, focused], _, onCleanup) => {
 const cards = computed(() => products.value.map((product) => {
   const expiry = getProductExpiry(product)
   const days = expiry.remainingDays
-  return { product, expiry, expiringSoon: days !== null && days >= 0 && days <= soonThresholdDays }
+  return { product, expiry, expiringSoon: days !== null && days >= 0 && days <= expiryWarningDays.value }
 }))
 
 const active = computed(() => cards.value.filter(({ product }) => product.archivedAt === null))

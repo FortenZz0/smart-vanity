@@ -3,12 +3,14 @@ import { ref } from 'vue'
 import BackupSettings from '../features/backup/BackupSettings.vue'
 import DemoSettings from '../features/demo/DemoSettings.vue'
 import { archivePromptSeconds, maxArchivePromptSeconds, setArchivePromptSeconds } from '../features/products/archivePromptDuration'
+import { expiryWarningDays, setExpiryWarningDays } from '../features/products/expiryWarningDays'
 import { setUpcomingRitualHours, upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
 import { languages, locale, translate } from '../locales'
 import { theme, themes } from '../theme'
 
 const draftHours = ref<number | string>(upcomingRitualHours.value)
 const draftPromptSeconds = ref<number | string>(archivePromptSeconds.value)
+const draftExpiryWarningDays = ref<number | string>(expiryWarningDays.value)
 </script>
 
 <template>
@@ -59,6 +61,19 @@ const draftPromptSeconds = ref<number | string>(archivePromptSeconds.value)
           required
         >
         <button type="submit" :disabled="draftPromptSeconds === archivePromptSeconds">{{ translate('save') }}</button>
+      </form>
+      <form @submit.prevent="setExpiryWarningDays(Number(draftExpiryWarningDays))">
+        <label for="expiry-warning-days">{{ translate('expiryWarningDaysSetting') }}</label>
+        <input
+          id="expiry-warning-days"
+          v-model.number="draftExpiryWarningDays"
+          type="number"
+          min="0"
+          :max="Number.MAX_SAFE_INTEGER"
+          step="1"
+          required
+        >
+        <button type="submit" :disabled="draftExpiryWarningDays === expiryWarningDays">{{ translate('save') }}</button>
       </form>
     </details>
   </section>
