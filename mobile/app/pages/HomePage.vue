@@ -12,9 +12,11 @@ import type { Ritual } from '../features/rituals/ritual'
 import RitualCard from '../features/rituals/RitualCard.vue'
 import { listRituals } from '../features/rituals/ritualRepository'
 import { upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
+import HomeSearch from '../features/search/HomeSearch.vue'
 import { translate } from '../locales'
 
 const rituals = ref<Ritual[]>([])
+const ritualsLoading = ref(true)
 const now = ref(new Date())
 let ritualClock: number | undefined
 const products = ref<Product[]>([])
@@ -93,6 +95,8 @@ onMounted(async () => {
     now.value = new Date()
   } catch (error) {
     console.error('Failed to load local rituals', error)
+  } finally {
+    ritualsLoading.value = false
   }
 })
 
@@ -131,6 +135,7 @@ async function runProductAction(product: Product, action: keyof typeof productAc
 <template>
   <div class="home">
     <h1>{{ translate('home') }}</h1>
+    <HomeSearch :products="products" :rituals="rituals" :loading="loadState === 'loading' || ritualsLoading" />
 
     <p v-if="loadState === 'loading'" class="home__status" role="status">
       {{ translate('productsLoading') }}
