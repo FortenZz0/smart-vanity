@@ -25,14 +25,14 @@ async function openDatabase(): Promise<SQLiteDBConnection> {
     const { demoProducts } = await import('./demoProducts')
     const { demoArchivedRituals, demoRituals } = await import('./demoRituals')
     upgrades = migrations.flatMap((migration) => {
-      if (migration.toVersion === 1) {
-        return [{ ...migration, statements: [...migration.statements, demoProducts] }]
-      }
       if (migration.toVersion === 4) {
         return [
           { toVersion: 3, statements: demoRituals },
           { ...migration, statements: [...migration.statements, ...demoArchivedRituals] },
         ]
+      }
+      if (migration.toVersion === 8) {
+        return [{ ...migration, statements: [...migration.statements, ...demoProducts] }]
       }
       return [migration]
     })

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
 import { translate } from '../../locales'
-import { exportBackup as downloadBackup, importBackup as restoreBackup, InvalidBackupError, resetBackupData } from './backup'
+import { resetLocalData } from '../data/resetLocalData'
+import { exportBackup as downloadBackup, importBackup as restoreBackup, InvalidBackupError } from './backup'
 
 const backupInput = ref<HTMLInputElement | null>(null)
 const optionsDialog = ref<HTMLDialogElement | null>(null)
@@ -101,7 +102,7 @@ async function resetBackup() {
   backupBusy.value = true
   backupMessage.value = null
   try {
-    await resetBackupData({ products: resetProducts.value, rituals: resetRituals.value })
+    await resetLocalData({ products: resetProducts.value, rituals: resetRituals.value })
     backupMessage.value = 'productBackupResetDone'
   } catch (error) {
     console.error('Failed to reset backup data', error)

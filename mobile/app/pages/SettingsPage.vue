@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BackupSettings from '../features/backup/BackupSettings.vue'
+import DemoSettings from '../features/demo/DemoSettings.vue'
 import { archivePromptSeconds, maxArchivePromptSeconds, setArchivePromptSeconds } from '../features/products/archivePromptDuration'
 import { setUpcomingRitualHours, upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
 import { languages, locale, translate } from '../locales'
@@ -43,6 +44,7 @@ const draftPromptSeconds = ref<number | string>(archivePromptSeconds.value)
       <button type="submit" :disabled="draftHours === upcomingRitualHours">{{ translate('save') }}</button>
     </form>
     <BackupSettings />
+    <DemoSettings />
     <details class="advanced-settings">
       <summary>{{ translate('advancedSettings') }}</summary>
       <form @submit.prevent="setArchivePromptSeconds(Number(draftPromptSeconds))">
