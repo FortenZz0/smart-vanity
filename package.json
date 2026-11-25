@@ -3,26 +3,28 @@
   "private": false,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": ["mobile"],
   "scripts": {
     "web-dev": "vite --mode web",
     "web-build": "vite build --mode web",
     "web-preview": "vite preview --mode web",
-    "android-dev": "vite --mode mobile",
-    "android-build": "vite build --mode mobile",
-    "android-preview": "vite preview --mode mobile",
-    "android-init": "npx cap add android && npx cap sync android",
-    "android-open": "npx cap sync android && npx cap open android"
+    
+    "mobile:dev": "npm run dev --workspace mobile --",
+    "mobile:dev:demo": "npm run dev:demo --workspace mobile --",
+    "mobile:build": "npm run build --workspace mobile --",
+    "mobile:build:demo": "npm run build:demo --workspace mobile --",
+    "mobile:preview": "npm run preview --workspace mobile --",
+    "android:init": "npm run android:init --workspace mobile --",
+    "android:open": "npm run android:open --workspace mobile --",
+    "android:run": "npm run android:run --workspace mobile --",
+    "anrodi:sync": "npm run android:sync -- workspace mobile --"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.5.2",
     "glob": "^13.0.6",
     "sass": "^1.105.1",
     "vite": "^8.3.2",
     "vite-plugin-full-reload": "^1.2.0",
     "vite-plugin-html-minifier": "^1.0.5",
     "vite-plugin-nunjucks": "^0.2.0"
-  },
-  "dependencies": {
-    "@capacitor/android": "^8.5.2"
   }
 }

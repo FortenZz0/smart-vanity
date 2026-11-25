@@ -1,0 +1,42 @@
+{
+  "name": "smart-vanity-mobile",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode mobile",
+    "dev:demo": "vite --mode demo",
+    "build": "npm run typecheck && vite build --mode mobile",
+    "build:demo": "npm run typecheck && vite build --mode demo",
+    "typecheck": "vue-tsc --noEmit -p app/tsconfig.json",
+    "preview": "vite preview --mode mobile",
+    "android:init": "npm run build && cap add android",
+    "android:open": "cap sync android && cap open android",
+    "android:run": "npm run build && cap run android",
+    "android:sync": "cap sync android",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@capacitor-community/sqlite": "^8.1.1",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/keyboard": "^8.0.6",
+    "@capacitor/local-notifications": "^8.3.1",
+    "@capacitor/share": "^8.0.3",
+    "jeep-sqlite": "2.8.0",
+    "sql.js": "1.11.0",
+    "vue": "^3.5.46",
+    "vue-router": "^4.6.5"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
+    "@vitejs/plugin-vue": "^6.0.11",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.2",
+    "vue-tsc": "^3.3.14",
+    "storybook": "^10.6.8",
+    "@storybook/vue3-vite": "^10.6.8"
+  }
+}

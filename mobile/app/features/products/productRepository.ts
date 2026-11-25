@@ -1,0 +1,139 @@
+import { queryDatabase, writeDatabase } from '../../storage/database'
+import { getLocalToday } from './expiry'
+import type { CalendarDate, ExpiryInput, Product, ShelfLifeUnit } from './product'
+
+type ProductRow = {
+  id: string
+  name: string
+  note: string
+  photo_id: string | null
+  icon_id: string | null
+  opened_on: CalendarDate | null
+  pao_months: number | null
+  archived_at: string | null
+  finished: number
+  created_at: string | null
+  updated_at: string | null
+} & (
+  | { expiry_kind: null }
+  | { expiry_kind: 'date'; expires_on: CalendarDate }
+  | { expiry_kind: 'shelfLife'; manufactured_on: CalendarDate; shelf_duration: number; shelf_unit: ShelfLifeUnit }
+)
+
+function toProduct(row: ProductRow): Product {
+  let expiry: ExpiryInput | null = null
+  if (row.expiry_kind === 'date') {
+    expiry = { kind: 'date', expiresOn: row.expires_on }
+  } else if (row.expiry_kind === 'shelfLife') {
+    expiry = {
+      kind: 'shelfLife',
+      manufacturedOn: row.manufactured_on,
+      duration: row.shelf_duration,
+      unit: row.shelf_unit,
+    }
+  }
+
+  return {
+    id: row.id,
+    name: row.name,
+    note: row.note,
+    photoId: row.photo_id,
+    iconId: row.icon_id,
+    openedOn: row.opened_on,
+    paoMonths: row.pao_months,
+    expiry,
+    archivedAt: row.archived_at,
+    finished: row.finished === 1,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+export async function listProducts(): Promise<Product[]> {
+  const rows = await queryDatabase<ProductRow>('SELECT * FROM products')
+  return rows.map(toProduct)
+}
+
+export async function getProduct(id: string): Promise<Product | null> {
+  const [row] = await queryDatabase<ProductRow>('SELECT * FROM products WHERE id = ?', [id])
+  return row ? toProduct(row) : null
+}
+
+export function markProductOpened(id: string): Promise<void> {
+  return writeDatabase(
+    'UPDATE products SET opened_on = ?, updated_at = ? WHERE id = ? AND opened_on IS NULL AND archived_at IS NULL',
+    [getLocalToday(), new Date().toISOString(), id],
+  )
+}
+
+export function archiveProduct(id: string): Promise<void> {
+  const now = new Date().toISOString()
+  return writeDatabase(
+    'UPDATE products SET archived_at = ?, updated_at = ? WHERE id = ? AND archived_at IS NULL',
+    [now, now, id],
+  )
+}
+
+export function restoreProduct(id: string): Promise<void> {
+  return writeDatabase(
+    'UPDATE products SET archived_at = NULL, updated_at = ? WHERE id = ? AND archived_at IS NOT NULL',
+    [new Date().toISOString(), id],
+  )
+}
+
+export function markArchivedProductFinished(id: string): Promise<void> {
+  return writeDatabase(
+    'UPDATE products SET finished = 1, updated_at = ? WHERE id = ? AND archived_at IS NOT NULL AND finished = 0',
+    [new Date().toISOString(), id],
+  )
+}
+
+export function deleteProduct(id: string): Promise<void> {
+  return writeDatabase('DELETE FROM products WHERE id = ?', [id])
+}
+
+const insertProduct = `
+    INSERT INTO products (
+      id, name, note, photo_id, icon_id, opened_on, pao_months, expiry_kind, expires_on,
+      manufactured_on, shelf_duration, shelf_unit, archived_at, finished, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`
+
+function productValues(product: Product) {
+  const { expiry } = product
+  const shelfLife = expiry?.kind === 'shelfLife' ? expiry : null
+  return [
+    product.id, product.name, product.note, product.photoId, product.iconId, product.openedOn, product.paoMonths,
+    expiry?.kind ?? null, expiry?.kind === 'date' ? expiry.expiresOn : null,
+    shelfLife?.manufacturedOn ?? null, shelfLife?.duration ?? null, shelfLife?.unit ?? null,
+    product.archivedAt, Number(product.finished), product.createdAt, product.updatedAt,
+  ]
+}
+
+export function saveProduct(product: Omit<Product, 'createdAt' | 'updatedAt'>): Promise<void> {
+  const now = new Date().toISOString()
+  return writeDatabase(`${insertProduct}
+    ON CONFLICT(id) DO UPDATE SET
+      name = excluded.name,
+      note = excluded.note,
+      photo_id = excluded.photo_id,
+      icon_id = excluded.icon_id,
+      opened_on = excluded.opened_on,
+      pao_months = excluded.pao_months,
+      expiry_kind = excluded.expiry_kind,
+      expires_on = excluded.expires_on,
+      manufactured_on = excluded.manufactured_on,
+      shelf_duration = excluded.shelf_duration,
+      shelf_unit = excluded.shelf_unit,
+      archived_at = excluded.archived_at,
+      finished = excluded.finished,
+      updated_at = excluded.updated_at;
+  `, productValues({ ...product, createdAt: now, updatedAt: now }))
+}
+
+export function insertProductStatement(product: Product) {
+  return {
+    statement: `${insertProduct};`,
+    values: productValues(product),
+  }
+}

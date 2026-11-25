@@ -1,0 +1,40 @@
+export const demoRituals = [
+  `INSERT OR IGNORE INTO rituals (id, name, schedule) VALUES
+    ('demo-ritual-01', 'Утренний уход', '{"kind":"daily"}'),
+    ('demo-ritual-02', 'Вечернее очищение', '{"kind":"daily"}'),
+    ('demo-ritual-03', 'Обновить SPF', '{"kind":"daily"}'),
+    ('demo-ritual-04', 'Увлажнить руки', '{"kind":"daily"}'),
+    ('demo-ritual-05', 'Маска для волос', '{"kind":"weekly","weekdays":[3,7]}'),
+    ('demo-ritual-06', 'Пилинг лица', '{"kind":"weekly","weekdays":[5]}'),
+    ('demo-ritual-07', 'Уход за кутикулой', '{"kind":"weekly","weekdays":[2,6]}'),
+    ('demo-ritual-08', 'Увлажняющая маска для лица',
+      json_object('kind', 'interval', 'everyDays', 3, 'startsOn', date('now', 'localtime'))),
+    ('demo-ritual-09', 'Масло для кожи головы',
+      json_object('kind', 'interval', 'everyDays', 5, 'startsOn', date('now', 'localtime', '+1 day'))),
+    ('demo-ritual-10', 'Помыть кисти для макияжа',
+      json_object('kind', 'interval', 'everyDays', 14, 'startsOn', date('now', 'localtime', '+3 days')));`,
+  `INSERT OR IGNORE INTO ritual_reminders (ritual_id, id, time, position) VALUES
+    ('demo-ritual-01', 'morning', '08:00', 0),
+    ('demo-ritual-02', 'evening', '21:30', 0),
+    ('demo-ritual-03', 'noon', '12:00', 0),
+    ('demo-ritual-03', 'afternoon', '15:00', 1),
+    ('demo-ritual-04', 'morning', '09:15', 0),
+    ('demo-ritual-04', 'evening', '22:00', 1),
+    ('demo-ritual-05', 'evening', '19:00', 0),
+    ('demo-ritual-06', 'evening', '20:45', 0),
+    ('demo-ritual-07', 'evening', '20:15', 0),
+    ('demo-ritual-08', 'evening', '18:30', 0),
+    ('demo-ritual-09', 'morning', '07:45', 0),
+    ('demo-ritual-10', 'morning', '10:30', 0);`,
+]
+
+export const demoArchivedRituals = [
+  `INSERT INTO rituals (id, name, schedule, archived_at) VALUES
+    ('demo-ritual-11', 'Вечерняя ванночка для рук', '{"kind":"daily"}', datetime('now', '-2 days')),
+    ('demo-ritual-12', 'Глиняная маска', '{"kind":"weekly","weekdays":[7]}', datetime('now', '-7 days')),
+    ('demo-ritual-13', 'Массаж лица', '{"kind":"weekly","weekdays":[1,4]}', datetime('now', '-14 days'));`,
+  `INSERT INTO ritual_reminders (ritual_id, id, time, position) VALUES
+    ('demo-ritual-11', 'evening', '21:00', 0),
+    ('demo-ritual-12', 'evening', '19:30', 0),
+    ('demo-ritual-13', 'morning', '08:15', 0);`,
+]

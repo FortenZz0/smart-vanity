@@ -178,3 +178,5 @@ dist-ssr
 *.sw?
 
 android
+*storybook.log
+storybook-static
