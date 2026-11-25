@@ -12,6 +12,10 @@
   --color-photo-placeholder: #eeebea;
   --color-expiry-warning-bg: #fbe4da;
   --color-expiry-warning-text: #84351f;
+  --color-expiry-soon-bg: #ffd2d8;
+  --color-expiry-soon-text: #951f37;
+  --color-expiry-ok-bg: #dbeacb;
+  --color-expiry-ok-text: #31532f;
 
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -30,6 +34,10 @@
   --color-photo-placeholder: #403a3b;
   --color-expiry-warning-bg: #65372c;
   --color-expiry-warning-text: #ffd6c7;
+  --color-expiry-soon-bg: #762f43;
+  --color-expiry-soon-text: #ffe1e7;
+  --color-expiry-ok-bg: #314a39;
+  --color-expiry-ok-text: #d5ebce;
 }
 
 a {

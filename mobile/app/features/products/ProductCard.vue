@@ -33,6 +33,13 @@ const quickAction = computed(() => {
 const actionIcon = computed(() => actions[quickAction.value].icon)
 const actionLabel = computed(() => translate(actions[quickAction.value].label))
 
+const expiryClass = computed(() => {
+  if (props.product.finished || props.product.archivedAt !== null) return
+  if (props.expiry.status === 'expired') return 'product-card__expiry--warning'
+  if (props.expiringSoon) return 'product-card__expiry--soon'
+  if (props.expiry.status === 'upcoming') return 'product-card__expiry--ok'
+})
+
 const photoUrl = ref<string | null>(null)
 
 watch(() => props.product.photoId, async (id, _previous, onCleanup) => {
@@ -88,7 +95,7 @@ const expiryLabel = computed(() => {
       </h3>
       <span
         class="product-card__expiry"
-        :class="{ 'product-card__expiry--warning': !product.finished && product.archivedAt === null && (expiringSoon || expiry.status === 'expired') }"
+        :class="expiryClass"
       >
         {{ product.finished ? translate('productFinished') : expiryLabel }}
       </span>
@@ -251,5 +258,15 @@ const expiryLabel = computed(() => {
 .product-card__expiry--warning {
   background: var(--color-expiry-warning-bg);
   color: var(--color-expiry-warning-text);
+}
+
+.product-card__expiry--soon {
+  background: var(--color-expiry-soon-bg);
+  color: var(--color-expiry-soon-text);
+}
+
+.product-card__expiry--ok {
+  background: var(--color-expiry-ok-bg);
+  color: var(--color-expiry-ok-text);
 }
 </style>
