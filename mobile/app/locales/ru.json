@@ -75,6 +75,8 @@
   "productBackupImportPhotos": "Импортировать фото",
   "productBackupImportRituals": "Импортировать ритуалы",
   "productBackupExport": "Экспорт",
+  "productBackupDownload": "Скачать",
+  "productBackupShare": "Поделиться",
   "productBackupImport": "Импорт",
   "productBackupReset": "Сброс",
   "productBackupConfirmReset": "Выбранные данные будут удалены, включая архивные записи. Вернуть их можно из сохранённой резервной копии.",

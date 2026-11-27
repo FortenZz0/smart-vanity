@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core'
+import { Capacitor, registerPlugin } from '@capacitor/core'
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { queryDatabase, writeDatabaseTransaction } from '../../storage/database'
@@ -10,6 +10,10 @@ import type { Ritual } from '../rituals/ritual'
 import { listRituals } from '../rituals/ritualRepository'
 import { syncRitualNotifications } from '../rituals/ritualNotifications'
 import { validateRitualInput, type RitualInput } from '../rituals/ritualValidation'
+
+const nativeBackup = registerPlugin<{
+  save(options: { filename: string; json: string }): Promise<void>
+}>('SmartVanityBackup')
 
 type BackupPhoto = { mimeType: string; base64: string }
 type BackupProduct = Omit<Product, 'photoId'> & { photo: BackupPhoto | null }
@@ -205,7 +209,7 @@ async function exportRituals(): Promise<BackupRitual[]> {
   }))
 }
 
-export async function exportBackup(options: BackupOptions): Promise<void> {
+export async function exportBackup(options: BackupOptions, destination: 'download' | 'share'): Promise<void> {
   const products: BackupProduct[] = []
   const sourceProducts = options.includeProducts ? await listProducts() : []
   for (const { photoId, ...product } of sourceProducts) {
@@ -221,7 +225,12 @@ export async function exportBackup(options: BackupOptions): Promise<void> {
   const json = JSON.stringify({ format, version, products, rituals }, null, 2)
   const filename = `smart-vanity-${new Date().toISOString().slice(0, 10)}.json`
 
-  if (Capacitor.isNativePlatform()) {
+  if (Capacitor.getPlatform() === 'android' && destination === 'download') {
+    await nativeBackup.save({ filename, json })
+    return
+  }
+
+  if (Capacitor.isNativePlatform() && destination === 'share') {
     const { uri } = await Filesystem.writeFile({
       directory: Directory.Cache,
       path: `backups/${crypto.randomUUID()}/${filename}`,

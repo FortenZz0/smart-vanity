@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
+import { Capacitor } from '@capacitor/core'
 import { translate } from '../../locales'
 import { resetLocalData } from '../data/resetLocalData'
-import { exportBackup as downloadBackup, importBackup as restoreBackup, InvalidBackupError } from './backup'
+import { exportBackup as saveBackup, importBackup as restoreBackup, InvalidBackupError } from './backup'
+
+const canShare = Capacitor.isNativePlatform()
 
 const backupInput = ref<HTMLInputElement | null>(null)
 const optionsDialog = ref<HTMLDialogElement | null>(null)
@@ -48,13 +51,13 @@ async function openOptions(nextAction: Action) {
   optionsDialog.value?.showModal()
 }
 
-async function exportBackup() {
+async function exportBackup(destination: 'download' | 'share') {
   if (backupBusy.value || !hasTransferSelection.value) return
   optionsDialog.value?.close()
   backupBusy.value = true
   backupMessage.value = null
   try {
-    await downloadBackup(transferOptions())
+    await saveBackup(transferOptions(), destination)
   } catch (error) {
     console.error('Failed to export the product backup', error)
     backupMessage.value = 'productBackupExportError'
@@ -172,9 +175,14 @@ async function resetBackup() {
         <button type="button" autofocus @click="optionsDialog?.close()">
           {{ translate('productBackupCancel') }}
         </button>
-        <button v-if="action === 'export'" type="button" :disabled="!hasTransferSelection" @click="exportBackup">
-          {{ translate('productBackupExport') }}
-        </button>
+        <template v-if="action === 'export'">
+          <button type="button" :disabled="!hasTransferSelection" @click="exportBackup('download')">
+            {{ translate('productBackupDownload') }}
+          </button>
+          <button v-if="canShare" type="button" :disabled="!hasTransferSelection" @click="exportBackup('share')">
+            {{ translate('productBackupShare') }}
+          </button>
+        </template>
         <button v-else-if="action === 'import'" type="button" :disabled="!hasTransferSelection" @click="backupInput?.click()">
           {{ translate('productBackupChooseFile') }}
         </button>

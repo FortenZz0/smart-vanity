@@ -75,6 +75,8 @@
   "productBackupImportPhotos": "Import photos",
   "productBackupImportRituals": "Import rituals",
   "productBackupExport": "Export",
+  "productBackupDownload": "Download",
+  "productBackupShare": "Share",
   "productBackupImport": "Import",
   "productBackupReset": "Reset",
   "productBackupConfirmReset": "Selected data, including archived entries, will be deleted. You can restore it from a saved backup.",
