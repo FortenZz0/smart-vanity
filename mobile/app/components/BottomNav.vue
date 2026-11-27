@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import exploreIcon from '../../assets/icons/explore.svg'
+import ritualIcon from '../../assets/icons/event_repeat.svg'
 import homeIcon from '../../assets/icons/home.svg'
 import profileIcon from '../../assets/icons/person.svg'
 import { translate } from '../locales'
@@ -10,7 +10,7 @@ const route = useRoute()
 
 const items = [
   { name: 'home', iconUrl: homeIcon },
-  { name: 'explore', iconUrl: exploreIcon },
+  { name: 'rituals', iconUrl: ritualIcon },
   { name: 'profile', iconUrl: profileIcon },
 ] as const
 </script>
