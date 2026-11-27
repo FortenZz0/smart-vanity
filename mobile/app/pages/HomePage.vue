@@ -157,7 +157,7 @@ async function runProductAction(product: Product, action: keyof typeof productAc
       <p v-if="actionFailed" class="home__status" role="alert">
         {{ translate('productSaveError') }}
       </p>
-      <section v-if="expiringSoon.length" aria-labelledby="expiring-soon-heading">
+      <section v-if="expiringSoon.length" class="home__expiring" aria-labelledby="expiring-soon-heading">
         <h2 id="expiring-soon-heading">{{ translate('expiringSoon') }}</h2>
         <ul class="home__list home__list--horizontal" tabindex="0">
           <li v-for="card in expiringSoon" :key="card.product.id">
@@ -174,7 +174,7 @@ async function runProductAction(product: Product, action: keyof typeof productAc
       </section>
     </template>
 
-    <details v-if="upcomingRituals.length">
+    <details v-if="upcomingRituals.length" class="home__upcoming" open>
       <summary><h2>{{ translate('upcomingRituals') }}</h2></summary>
       <ul class="home__list" role="list">
         <li v-for="{ ritual } in upcomingRituals" :key="ritual.id">
@@ -242,10 +242,16 @@ async function runProductAction(product: Product, action: keyof typeof productAc
 
 .home h2 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
 }
 
 .home summary {
+  min-block-size: 2.75rem;
+  box-sizing: border-box;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
   cursor: pointer;
 }
 
@@ -258,14 +264,26 @@ async function runProductAction(product: Product, action: keyof typeof productAc
 }
 
 .home__products-summary--with-options {
-  box-sizing: border-box;
-  min-block-size: 2.75rem;
-  padding-block: 0.625rem;
   padding-inline-end: 3.25rem;
+}
+
+.home__expiring {
+  min-inline-size: 0;
+  padding: 0.875rem;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-soft);
+}
+
+.home__upcoming summary {
+  background: var(--color-selected-bg);
 }
 
 .home__status {
   margin: 0.5rem 0 0;
+  padding: 0.875rem;
+  border: 1px dashed var(--color-divider);
+  border-radius: var(--radius-control);
   color: var(--color-text-muted);
 }
 
@@ -284,7 +302,7 @@ async function runProductAction(product: Product, action: keyof typeof productAc
 .home__list--horizontal {
   display: flex;
   overflow-x: auto;
-  padding-block-end: 0.375rem;
+  padding: 0.125rem 0.125rem 0.5rem;
   scroll-snap-type: x proximity;
 }
 

@@ -124,15 +124,28 @@ function openFirstResult() {
 
 .home-search__field {
   display: flex;
+  align-items: center;
   border: 1px solid var(--color-divider);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-card);
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.home-search__field::before {
+  flex: none;
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  margin-inline-start: 0.875rem;
+  background: currentColor;
+  color: var(--color-accent);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='m16 16 4 4'/%3E%3C/svg%3E") center / contain no-repeat;
+  content: '';
 }
 
 .home-search__field input {
   flex: 1;
   min-inline-size: 0;
-  min-block-size: 2.75rem;
+  min-block-size: 3.25rem;
   padding: 0.625rem 0.75rem;
   border: 0;
   border-radius: inherit;
@@ -151,6 +164,7 @@ function openFirstResult() {
 
 .home-search__field button {
   min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
   border: 0;
   border-radius: inherit;
   background: transparent;
@@ -167,8 +181,9 @@ function openFirstResult() {
   margin-block-start: 0.375rem;
   padding: 0.5rem;
   border: 1px solid var(--color-divider);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-card);
   background: var(--color-surface);
+  box-shadow: var(--shadow-action);
 }
 
 .home-search__qualifiers {

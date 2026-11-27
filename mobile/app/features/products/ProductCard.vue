@@ -127,7 +127,7 @@ const expiryLabel = computed(() => {
 .product-card-link::after {
   position: absolute;
   inset: 0;
-  border-radius: 0.875rem;
+  border-radius: var(--radius-card);
   content: '';
 }
 
@@ -141,14 +141,15 @@ const expiryLabel = computed(() => {
   isolation: isolate;
   display: grid;
   gap: 0.75rem;
-  padding: 0.625rem;
+  padding: 0.75rem;
   border: 1px solid var(--color-divider);
-  border-radius: 0.875rem;
+  border-radius: var(--radius-card);
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .product-card--row {
-  grid-template-columns: 4rem minmax(0, 1fr) 3.75rem;
+  grid-template-columns: 3.75rem minmax(0, 1fr) 2.875rem;
   align-items: center;
 }
 
@@ -172,8 +173,8 @@ const expiryLabel = computed(() => {
   padding: 0;
   place-items: center;
   border: 0;
-  border-radius: 0.375rem;
-  background: transparent;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
   color: var(--color-text-muted);
   cursor: pointer;
 }
@@ -193,7 +194,7 @@ const expiryLabel = computed(() => {
 }
 
 .product-card__action span {
-  inline-size: min(80%, 2.5rem);
+  inline-size: min(75%, 1.5rem);
   aspect-ratio: 1;
   background: currentColor;
   mask-position: center;
@@ -201,16 +202,12 @@ const expiryLabel = computed(() => {
   mask-size: contain;
 }
 
-.product-card--row .product-card__action span {
-  inline-size: min(80%, 3rem);
-}
-
 .product-card__photo {
   display: grid;
   place-items: center;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-control);
   background: var(--color-photo-placeholder);
   color: var(--color-text-muted);
   font-size: 0.75rem;
