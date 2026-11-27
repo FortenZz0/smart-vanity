@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BackupSettings from '../features/backup/BackupSettings.vue'
-import { archivePromptSeconds, maxArchivePromptSeconds, setArchivePromptSeconds } from '../features/products/archivePromptDuration'
 import { expiryWarningDays, setExpiryWarningDays } from '../features/products/expiryWarningDays'
 import { setUpcomingRitualHours, upcomingRitualHours } from '../features/rituals/upcomingRitualHours'
 import { languages, locale, translate } from '../locales'
 import { theme, themes } from '../theme'
 
 const draftHours = ref<number | string>(upcomingRitualHours.value)
-const draftPromptSeconds = ref<number | string>(archivePromptSeconds.value)
 const draftExpiryWarningDays = ref<number | string>(expiryWarningDays.value)
 </script>
 
@@ -44,36 +42,20 @@ const draftExpiryWarningDays = ref<number | string>(expiryWarningDays.value)
       >
       <button type="submit" :disabled="draftHours === upcomingRitualHours">{{ translate('save') }}</button>
     </form>
+    <form @submit.prevent="setExpiryWarningDays(Number(draftExpiryWarningDays))">
+      <label for="expiry-warning-days">{{ translate('expiryWarningDaysSetting') }}</label>
+      <input
+        id="expiry-warning-days"
+        v-model.number="draftExpiryWarningDays"
+        type="number"
+        min="0"
+        :max="Number.MAX_SAFE_INTEGER"
+        step="1"
+        required
+      >
+      <button type="submit" :disabled="draftExpiryWarningDays === expiryWarningDays">{{ translate('save') }}</button>
+    </form>
     <BackupSettings />
-    <details class="advanced-settings">
-      <summary>{{ translate('advancedSettings') }}</summary>
-      <form @submit.prevent="setArchivePromptSeconds(Number(draftPromptSeconds))">
-        <label for="archive-prompt-seconds">{{ translate('archivePromptDurationSetting') }}</label>
-        <input
-          id="archive-prompt-seconds"
-          v-model.number="draftPromptSeconds"
-          type="number"
-          min="1"
-          :max="maxArchivePromptSeconds"
-          step="1"
-          required
-        >
-        <button type="submit" :disabled="draftPromptSeconds === archivePromptSeconds">{{ translate('save') }}</button>
-      </form>
-      <form @submit.prevent="setExpiryWarningDays(Number(draftExpiryWarningDays))">
-        <label for="expiry-warning-days">{{ translate('expiryWarningDaysSetting') }}</label>
-        <input
-          id="expiry-warning-days"
-          v-model.number="draftExpiryWarningDays"
-          type="number"
-          min="0"
-          :max="Number.MAX_SAFE_INTEGER"
-          step="1"
-          required
-        >
-        <button type="submit" :disabled="draftExpiryWarningDays === expiryWarningDays">{{ translate('save') }}</button>
-      </form>
-    </details>
   </section>
 </template>
 
@@ -89,7 +71,7 @@ const draftExpiryWarningDays = ref<number | string>(expiryWarningDays.value)
   letter-spacing: -0.025em;
 }
 
-.profile-settings > :is(p, form, section, details) {
+.profile-settings > :is(p, form, section) {
   min-inline-size: 0;
   margin: 0;
   padding: 0.875rem;
@@ -117,7 +99,7 @@ const draftExpiryWarningDays = ref<number | string>(expiryWarningDays.value)
   grid-column: 1 / -1;
 }
 
-.profile-settings :is(label, summary) {
+.profile-settings label {
   font-weight: 600;
 }
 
@@ -147,15 +129,5 @@ const draftExpiryWarningDays = ref<number | string>(expiryWarningDays.value)
   border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-on-accent);
-}
-
-.advanced-settings summary {
-  cursor: pointer;
-}
-
-.advanced-settings form {
-  margin-block-start: 1rem;
-  padding-block-start: 0.875rem;
-  border-block-start: 1px solid var(--color-divider);
 }
 </style>

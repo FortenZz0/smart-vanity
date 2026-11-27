@@ -39,7 +39,7 @@ const promptFocused = ref(false)
 
 watch([archivePrompt, promptFocused], ([product, focused], _, onCleanup) => {
   if (!product || focused) return
-  const timeout = window.setTimeout(() => { archivePrompt.value = null }, archivePromptSeconds.value * 1000)
+  const timeout = window.setTimeout(() => { archivePrompt.value = null }, archivePromptSeconds * 1000)
   onCleanup(() => window.clearTimeout(timeout))
 })
 
