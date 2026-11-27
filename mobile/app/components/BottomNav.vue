@@ -32,7 +32,7 @@ const items = [
 
 <style scoped>
 .bottom-nav {
-  padding: 0.5rem;
+  padding: 0.375rem 0.75rem;
   padding-right: max(0.5rem, env(safe-area-inset-right));
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   padding-left: max(0.5rem, env(safe-area-inset-left));
@@ -43,7 +43,7 @@ const items = [
 .bottom-nav__items {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.25rem;
+  gap: 0.5rem;
   max-width: 30rem;
   margin-inline: auto;
 }

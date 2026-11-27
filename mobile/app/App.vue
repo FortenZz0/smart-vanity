@@ -92,6 +92,7 @@ onUnmounted(() => {
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  line-height: 1.45;
 }
 
 .app-shell {
@@ -102,9 +103,12 @@ body {
 }
 
 .screen {
+  box-sizing: border-box;
+  inline-size: min(100%, 46rem);
   min-inline-size: 0;
+  margin-inline: auto;
   padding:
-    calc(1rem + env(safe-area-inset-top, 0px))
+    calc(1.5rem + env(safe-area-inset-top, 0px))
     calc(1rem + env(safe-area-inset-right, 0px))
     1rem
     calc(1rem + env(safe-area-inset-left, 0px));
@@ -112,6 +116,11 @@ body {
 
 .screen h1 {
   margin: 0;
+  font-size: clamp(1.85rem, 6vw, 2.5rem);
+  font-weight: 750;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
 }
 
 .app-footer {
