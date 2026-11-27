@@ -22,3 +22,27 @@ if (!activity.includes(registration)) {
   await writeFile(main, activity)
 }
 await copyFile(source, new URL('SmartVanityBackupPlugin.java', java))
+
+const manifestFile = new URL('../android/app/src/main/AndroidManifest.xml', import.meta.url)
+const manifest = await readFile(manifestFile, 'utf8')
+const filters = `<!-- Smart Vanity backup files -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/vnd.smartvanity.backup" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:host="*" android:pathPattern=".*\\\\.sv" />
+                <data android:mimeType="*/*" />
+            </intent-filter>`
+if (!manifest.includes(filters)) {
+  const end = '</activity>'
+  if (!manifest.includes(end)) throw new Error('Could not register the Android backup intent filters')
+  await writeFile(manifestFile, manifest.replace(end, `${filters}\n        ${end}`))
+}

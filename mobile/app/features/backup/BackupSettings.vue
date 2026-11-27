@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { Capacitor } from '@capacitor/core'
 import { translate } from '../../locales'
 import { resetLocalData } from '../data/resetLocalData'
-import { exportBackup as saveBackup, importBackup as restoreBackup, InvalidBackupError } from './backup'
+import { exportBackup as saveBackup, importBackup as restoreBackup, incomingBackupUri, InvalidBackupError, readIncomingBackup } from './backup'
 
 const canShare = Capacitor.isNativePlatform()
+const backupAccept = Capacitor.getPlatform() === 'android' ? undefined : '.sv,.json,application/vnd.smartvanity.backup,application/json'
 
 const backupInput = ref<HTMLInputElement | null>(null)
 const optionsDialog = ref<HTMLDialogElement | null>(null)
@@ -42,9 +43,17 @@ const backupMessage = ref<
   'productBackupImported' | 'productBackupInvalid' | 'productBackupImportError' | 'productBackupExportError' |
   'productBackupResetDone' | 'productBackupResetError' | null
 >(null)
+const selectedBackupUri = ref<string | null>(null)
 
-async function openOptions(nextAction: Action) {
+watch([incomingBackupUri, backupBusy], ([uri, busy]) => {
+  if (!uri || busy) return
+  incomingBackupUri.value = null
+  void openOptions('import', uri)
+}, { immediate: true })
+
+async function openOptions(nextAction: Action, uri: string | null = null) {
   action.value = nextAction
+  selectedBackupUri.value = uri
   fullTransfer.value = true
   fullReset.value = false
   await nextTick()
@@ -66,18 +75,28 @@ async function exportBackup(destination: 'download' | 'share') {
   }
 }
 
-async function importBackup(event: Event) {
+function importFile(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
-  if (!file || backupBusy.value || !hasTransferSelection.value) return
+  if (file) void importBackup(() => file.text())
+}
+
+function confirmImport() {
+  const uri = selectedBackupUri.value
+  if (uri) void importBackup(() => readIncomingBackup(uri))
+  else backupInput.value?.click()
+}
+
+async function importBackup(read: () => Promise<string>) {
+  if (backupBusy.value || !hasTransferSelection.value) return
 
   optionsDialog.value?.close()
   backupBusy.value = true
   backupMessage.value = null
   try {
     const options = transferOptions()
-    await restoreBackup(await file.text(), options)
+    await restoreBackup(await read(), options)
     backupMessage.value = 'productBackupImported'
   } catch (error) {
     if (error instanceof InvalidBackupError) {
@@ -170,7 +189,7 @@ async function resetBackup() {
           </label>
         </div>
       </template>
-      <input ref="backupInput" type="file" accept=".json,application/json" hidden @change="importBackup">
+      <input ref="backupInput" type="file" :accept="backupAccept" hidden @change="importFile">
       <div class="product-backup__actions">
         <button type="button" autofocus @click="optionsDialog?.close()">
           {{ translate('productBackupCancel') }}
@@ -183,8 +202,8 @@ async function resetBackup() {
             {{ translate('productBackupShare') }}
           </button>
         </template>
-        <button v-else-if="action === 'import'" type="button" :disabled="!hasTransferSelection" @click="backupInput?.click()">
-          {{ translate('productBackupChooseFile') }}
+        <button v-else-if="action === 'import'" type="button" :disabled="!hasTransferSelection" @click="confirmImport">
+          {{ translate(selectedBackupUri ? 'productBackupImport' : 'productBackupChooseFile') }}
         </button>
         <button
           v-else

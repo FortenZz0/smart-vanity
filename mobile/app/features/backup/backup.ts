@@ -1,4 +1,4 @@
-import { Capacitor, registerPlugin } from '@capacitor/core'
+import { Capacitor, registerPlugin, type PluginListenerHandle } from '@capacitor/core'
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { queryDatabase, writeDatabaseTransaction } from '../../storage/database'
@@ -10,10 +10,31 @@ import type { Ritual } from '../rituals/ritual'
 import { listRituals } from '../rituals/ritualRepository'
 import { syncRitualNotifications } from '../rituals/ritualNotifications'
 import { validateRitualInput, type RitualInput } from '../rituals/ritualValidation'
+import { ref } from 'vue'
 
 const nativeBackup = registerPlugin<{
   save(options: { filename: string; json: string }): Promise<void>
+  getLaunchBackup(): Promise<{ uri?: string }>
+  addListener(event: 'backupOpen', listener: (backup: { uri: string }) => void): Promise<PluginListenerHandle>
 }>('SmartVanityBackup')
+export const incomingBackupUri = ref<string | null>(null)
+
+export async function listenForIncomingBackups(openBackup: () => Promise<unknown>): Promise<void> {
+  function receive({ uri }: { uri?: string }) {
+    if (!uri) return
+    incomingBackupUri.value = uri
+    void openBackup().catch((error: unknown) => console.error('Failed to open backup settings', error))
+  }
+
+  const launch = await nativeBackup.getLaunchBackup()
+  receive(launch)
+  await nativeBackup.addListener('backupOpen', receive)
+}
+
+export async function readIncomingBackup(uri: string): Promise<string> {
+  const { data } = await Filesystem.readFile({ path: uri, encoding: Encoding.UTF8 })
+  return typeof data === 'string' ? data : data.text()
+}
 
 type BackupPhoto = { mimeType: string; base64: string }
 type BackupProduct = Omit<Product, 'photoId'> & { photo: BackupPhoto | null }
@@ -223,7 +244,7 @@ export async function exportBackup(options: BackupOptions, destination: 'downloa
   }
   const rituals = options.includeRituals ? await exportRituals() : []
   const json = JSON.stringify({ format, version, products, rituals }, null, 2)
-  const filename = `smart-vanity-${new Date().toISOString().slice(0, 10)}.json`
+  const filename = `smart-vanity-${new Date().toISOString().slice(0, 10)}.sv`
 
   if (Capacitor.getPlatform() === 'android' && destination === 'download') {
     await nativeBackup.save({ filename, json })
@@ -246,7 +267,7 @@ export async function exportBackup(options: BackupOptions, destination: 'downloa
     return
   }
 
-  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }))
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/vnd.smartvanity.backup' }))
   const link = document.createElement('a')
   link.href = url
   link.download = filename

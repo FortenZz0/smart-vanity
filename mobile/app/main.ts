@@ -2,6 +2,7 @@ import { App as CapacitorApp } from '@capacitor/app'
 import { Capacitor } from '@capacitor/core'
 import { createApp } from 'vue'
 import App from './App.vue'
+import { listenForIncomingBackups } from './features/backup/backup'
 import { syncRitualNotifications } from './features/rituals/ritualNotifications'
 import { router } from './router'
 import { initializeDatabase } from './storage/database'
@@ -11,6 +12,8 @@ import './theme'
 createApp(App).use(router).mount('#app')
 
 if (Capacitor.getPlatform() === 'android') {
+  void router.isReady().then(() => listenForIncomingBackups(() => router.push({ name: 'profile' })))
+    .catch((error: unknown) => console.error('Failed to register Android backup opening', error))
   void router.isReady().then(() => CapacitorApp.addListener('backButton', ({ canGoBack }) => {
     const dialog = document.querySelector<HTMLDialogElement>('dialog[open]')
     if (dialog) {
