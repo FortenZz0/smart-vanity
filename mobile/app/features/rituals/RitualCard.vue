@@ -136,10 +136,11 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
   align-content: center;
   justify-items: start;
   gap: 0.375rem;
-  padding: 0.625rem;
+  padding: 0.75rem;
   border: 1px solid var(--color-divider);
-  border-radius: 0.875rem;
+  border-radius: var(--radius-card);
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .ritual-card--with-actions {
@@ -154,7 +155,7 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
 .ritual-card__link::after {
   position: absolute;
   inset: 0;
-  border-radius: 0.875rem;
+  border-radius: var(--radius-card);
   content: '';
 }
 
@@ -170,6 +171,8 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
   display: grid;
   grid-auto-flow: column;
   align-self: center;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
 }
 
 .ritual-card__actions button {
@@ -179,7 +182,7 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
   padding: 0;
   place-items: center;
   border: 0;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--color-text-muted);
   cursor: pointer;
@@ -190,6 +193,7 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
 }
 
 .ritual-card__actions .ritual-card__toggle {
+  background: var(--color-selected-bg);
   color: var(--color-accent);
 }
 
@@ -214,25 +218,32 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
 }
 
 .ritual-card h2 {
-  max-inline-size: 100%;
   margin: 0;
-  overflow: hidden;
   font-size: 1rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .ritual-card__reminder {
   max-inline-size: 100%;
   box-sizing: border-box;
   padding: 0.25rem 0.5rem;
-  overflow: hidden;
-  border-radius: 0.375rem;
-  background: var(--color-bg);
-  color: var(--color-text-muted);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
+  color: var(--color-accent);
   font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
   font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 22.5rem) {
+  .ritual-card--with-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ritual-card__actions {
+    grid-area: auto;
+    justify-self: end;
+  }
 }
 </style>

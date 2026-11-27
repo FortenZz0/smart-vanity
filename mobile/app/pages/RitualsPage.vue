@@ -60,7 +60,9 @@ onUnmounted(() => window.clearInterval(clock))
     </div>
     <template v-else>
       <details v-for="section in sections" :key="section.title" :open="section.open">
-        <summary>{{ translate(section.title) }}</summary>
+        <summary>
+          <h2>{{ translate(section.title) }}</h2>
+        </summary>
         <ul v-if="section.rituals.length" class="rituals__list" role="list">
           <li v-for="ritual in section.rituals" :key="ritual.id">
             <RitualCard
@@ -86,9 +88,17 @@ onUnmounted(() => window.clearInterval(clock))
 }
 
 .rituals summary {
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
   cursor: pointer;
-  font-size: 1.2rem;
-  font-weight: 700;
+}
+
+.rituals summary h2 {
+  display: inline;
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
 }
 
 .rituals__list {
@@ -111,5 +121,8 @@ onUnmounted(() => window.clearInterval(clock))
 
 .rituals details > .rituals__status {
   margin-block-start: 0.5rem;
+  padding: 0.875rem;
+  border: 1px dashed var(--color-divider);
+  border-radius: var(--radius-control);
 }
 </style>
