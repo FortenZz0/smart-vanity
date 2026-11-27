@@ -172,11 +172,12 @@ async function discardPhoto(id: string) {
   })
 }
 
-function goBack() {
-  if (router.options.history.state.back) {
+async function goToProducts() {
+  const destination = { name: 'home' }
+  if (router.options.history.state.back === router.resolve(destination).fullPath) {
     router.back()
   } else {
-    void router.replace({ name: 'home' })
+    await router.replace(destination)
   }
 }
 
@@ -192,7 +193,7 @@ async function removeProduct() {
     await deleteProduct(product.id)
     if (product.photoId) await discardPhoto(product.photoId)
     if (router.currentRoute.value === submittedFrom) {
-      await router.replace({ name: 'home' })
+      await goToProducts()
     }
   } catch (error) {
     console.error('Failed to delete the product', error)
@@ -235,7 +236,7 @@ async function submitProduct(event: SubmitEvent) {
     })
     if (original?.photoId && original.photoId !== photoId) await discardPhoto(original.photoId)
     if (router.currentRoute.value === submittedFrom) {
-      await router.replace({ name: 'home' })
+      await goToProducts()
     }
   } catch (error) {
     if (addedPhoto) await discardPhoto(addedPhoto)
@@ -249,9 +250,6 @@ async function submitProduct(event: SubmitEvent) {
 
 <template>
   <section>
-    <button class="product-editor__back" type="button" @click="goBack">
-      <span aria-hidden="true">←</span> {{ translate('back') }}
-    </button>
     <h1>{{ translate(productId ? 'editProduct' : 'addProduct') }}</h1>
     <p v-if="loadState === 'loading'" role="status">{{ translate('productLoading') }}</p>
     <div v-else-if="loadState === 'missing'">
@@ -392,16 +390,6 @@ async function submitProduct(event: SubmitEvent) {
 </template>
 
 <style scoped>
-.product-editor__back {
-  margin-block-end: 0.5rem;
-  padding: 0.25rem 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-accent);
-  cursor: pointer;
-  font: inherit;
-}
-
 .product-form {
   display: grid;
   gap: 1rem;

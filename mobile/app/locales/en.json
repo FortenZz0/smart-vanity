@@ -186,7 +186,6 @@
   "productEffectiveExpiry": "Effective expiry — {date}",
   "productDatesInvalid": "Check the dates and shelf life duration.",
   "save": "Save",
-  "back": "Back",
   "delete": "Delete",
   "confirmDeleteProduct": "Permanently delete this product?",
   "productSaveError": "Could not save the product. Try again.",

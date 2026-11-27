@@ -143,9 +143,6 @@ async function submitRitual(event: SubmitEvent) {
 
 <template>
   <section>
-    <button class="ritual-back" type="button" :disabled="saving" @click="goToRituals">
-      <span aria-hidden="true">←</span> {{ translate('back') }}
-    </button>
     <h1>{{ translate(props.ritualId ? 'editRitual' : 'createRitual') }}</h1>
 
     <p v-if="loadState === 'loading'" role="status">{{ translate('ritualLoading') }}</p>
@@ -237,15 +234,6 @@ async function submitRitual(event: SubmitEvent) {
 </template>
 
 <style scoped>
-.ritual-back {
-  margin-block-end: 0.5rem;
-  padding: 0.25rem 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-accent);
-  font: inherit;
-}
-
 .ritual-form {
   max-inline-size: 30rem;
   margin-block-start: 1rem;
