@@ -51,6 +51,16 @@ npm run mobile:preview
 npm run android:open
 ```
 
+Сборка APK из корня репозитория:
+```bash
+npm run android:apk -- --debug
+npm run android:apk -- --release
+```
+
+Команды собирают мобильное приложение, синхронизируют Capacitor и копируют APK
+в `mobile/android/dist/debug` или `mobile/android/dist/release` соответственно.
+Для запуска нужны JDK и Android SDK. Gradle создаёт подписанный debug APK.
+Release APK собирается без подписи, т.к. я в Android-проекте не настроил подпись(
 #### Запуск с примерами товаров
 
 `npm run mobile:dev:demo` запускает мобильное приложение в браузере с отдельной SQLite-базой. При её первом открытии добавляются 20 товаров без фото, в том числе архивные. Сроки рассчитываются относительно даты первого запуска.

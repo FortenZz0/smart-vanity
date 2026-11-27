@@ -14,6 +14,7 @@
     "android:open": "cap sync android && cap open android",
     "android:run": "npm run build && cap run android",
     "android:sync": "cap sync android",
+    "android:apk": "node scripts/build-apk.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

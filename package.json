@@ -17,7 +17,8 @@
     "android:init": "npm run android:init --workspace mobile --",
     "android:open": "npm run android:open --workspace mobile --",
     "android:run": "npm run android:run --workspace mobile --",
-    "anrodi:sync": "npm run android:sync -- workspace mobile --"
+    "android:apk": "npm run android:apk --workspace mobile --",
+    "android:sync": "npm run android:sync --workspace mobile --"
   },
   "devDependencies": {
     "glob": "^13.0.6",
