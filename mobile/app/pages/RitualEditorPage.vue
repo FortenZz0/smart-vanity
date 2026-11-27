@@ -261,6 +261,7 @@ async function submitRitual(event: SubmitEvent) {
 .ritual-form legend {
   margin-block-end: 0.375rem;
   padding: 0;
+  font-weight: 600;
 }
 
 .ritual-form__fields,
@@ -272,18 +273,25 @@ async function submitRitual(event: SubmitEvent) {
 .ritual-form__field {
   display: grid;
   gap: 0.375rem;
+  font-weight: 600;
 }
 
-.ritual-form input:not([type='checkbox']),
-.ritual-form select,
+.ritual-form .ritual-form__fields {
+  padding: clamp(0.75rem, 3vw, 1.25rem);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
 .ritual-form__reminders button {
   min-inline-size: 0;
   min-block-size: 2.75rem;
   box-sizing: border-box;
   padding: 0.5rem;
-  border: 1px solid var(--color-text-muted);
-  border-radius: 0.375rem;
-  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
   color: var(--color-text);
   font: inherit;
 }
@@ -317,9 +325,9 @@ async function submitRitual(event: SubmitEvent) {
   aspect-ratio: 1;
   min-inline-size: 0;
   place-items: center;
-  border: 1px solid var(--color-text-muted);
-  border-radius: 50%;
-  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
   font-size: 0.8125rem;
   font-weight: 600;
 }

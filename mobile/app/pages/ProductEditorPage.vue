@@ -428,7 +428,7 @@ async function submitProduct(event: SubmitEvent) {
   overflow: hidden;
   padding: 0;
   border: 0;
-  border-radius: 0.625rem;
+  border-radius: var(--radius-card);
   background: var(--color-photo-placeholder);
   color: var(--color-text-muted);
 }
@@ -466,9 +466,10 @@ async function submitProduct(event: SubmitEvent) {
 
 .product-form__photo-actions button,
 .product-form__icon-picker button {
+  min-block-size: 2.75rem;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--color-divider);
-  border-radius: 0.5rem;
+  border-radius: var(--radius-control);
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
@@ -478,7 +479,7 @@ async function submitProduct(event: SubmitEvent) {
   box-sizing: border-box;
   inline-size: min(22rem, calc(100% - 2rem));
   border: 1px solid var(--color-divider);
-  border-radius: 0.875rem;
+  border-radius: var(--radius-card);
   background: var(--color-surface);
   color: var(--color-text);
   text-align: start;
@@ -526,9 +527,12 @@ async function submitProduct(event: SubmitEvent) {
   min-inline-size: 0;
   max-inline-size: 30rem;
   margin: 0;
-  padding: 0;
+  padding: clamp(0.75rem, 3vw, 1.25rem);
   gap: 1rem;
-  border: 0;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
   text-align: start;
 }
 
@@ -537,14 +541,9 @@ async function submitProduct(event: SubmitEvent) {
   gap: 0.375rem;
 }
 
-.product-form__field :is(input, textarea, select) {
-  min-inline-size: 0;
-  padding: 0.625rem;
-  border: 1px solid var(--color-text-muted);
-  border-radius: 0.375rem;
-  background: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
+.product-form__field > span,
+.expiry-toggle legend {
+  font-weight: 600;
 }
 
 .expiry-toggle {
@@ -565,8 +564,8 @@ async function submitProduct(event: SubmitEvent) {
   gap: 0.25rem;
   padding: 0.25rem;
   border: 1px solid var(--color-divider);
-  border-radius: 0.5rem;
-  background: var(--color-surface);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
 }
 
 .expiry-toggle__options label {

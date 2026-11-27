@@ -30,8 +30,7 @@ defineEmits<{ delete: [] }>()
 <style scoped>
 .editor-actions {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem;
 }
 
@@ -39,11 +38,16 @@ defineEmits<{ delete: [] }>()
   min-block-size: 2.75rem;
   padding: 0.5rem;
   border: 0;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-control);
   background: var(--color-accent);
   color: var(--color-on-accent);
   font: inherit;
+  font-weight: 600;
   overflow-wrap: anywhere;
+}
+
+.editor-actions button:first-child {
+  grid-column: 1 / -1;
 }
 
 .editor-actions button:disabled {
