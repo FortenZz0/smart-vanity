@@ -1,0 +1,50 @@
+import groovy.json.JsonSlurper
+
+def capacitorConfig = new JsonSlurper().parse(rootProject.file('../capacitor.config.json'))
+def signingVariables = [
+    'SMART_VANITY_KEYSTORE',
+    'SMART_VANITY_KEYSTORE_PASSWORD',
+    'SMART_VANITY_KEY_ALIAS',
+    'SMART_VANITY_KEY_PASSWORD'
+]
+def signing = signingVariables.collectEntries { name -> [(name): providers.environmentVariable(name).orNull] }
+def missing = signingVariables.findAll { name -> !signing[name] }
+def keystore = signing.SMART_VANITY_KEYSTORE ? file(signing.SMART_VANITY_KEYSTORE) : null
+
+android {
+    defaultConfig {
+        applicationId capacitorConfig.appId
+        versionCode 1
+        versionName '1.0'
+    }
+    signingConfigs {
+        if (missing.isEmpty()) {
+            release {
+                storeFile keystore
+                storePassword signing.SMART_VANITY_KEYSTORE_PASSWORD
+                keyAlias signing.SMART_VANITY_KEY_ALIAS
+                keyPassword signing.SMART_VANITY_KEY_PASSWORD
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (missing.isEmpty()) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+}
+
+tasks.configureEach {
+    if (name == 'preReleaseBuild') {
+        doFirst {
+            if (!missing.isEmpty()) {
+                throw new GradleException("Set the release signing environment variables: ${missing.join(', ')}")
+            }
+            if (!keystore.isFile()) {
+                throw new GradleException('SMART_VANITY_KEYSTORE must point to an existing keystore file.')
+            }
+        }
+    }
+}

@@ -178,5 +178,9 @@ dist-ssr
 *.sw?
 
 android
+*.jks
+*.keystore
+*.p12
+*.pfx
 *storybook.log
 storybook-static
