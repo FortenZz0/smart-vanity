@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
-import { RouterLink } from 'vue-router'
 import profileIcon from '../../assets/icons/person.svg'
+import ProfileSettings from '../components/ProfileSettings.vue'
 import { translate } from '../locales'
 
 const nameKey = 'smart-vanity.profile-name'
@@ -202,7 +202,7 @@ function savePhoto() {
       />
       <p v-if="nameFailed" class="profile-error" role="alert">{{ translate('profileNameError') }}</p>
     </div>
-    <p><RouterLink :to="{ name: 'settings' }">{{ translate('settings') }}</RouterLink></p>
+    <ProfileSettings />
   </section>
 </template>
 

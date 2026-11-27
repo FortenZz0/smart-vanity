@@ -32,7 +32,7 @@ async function resetToDemo() {
 
 <template>
   <section class="demo-settings" aria-labelledby="demo-settings-title">
-    <h2 id="demo-settings-title">{{ translate('demoSettings') }}</h2>
+    <h3 id="demo-settings-title">{{ translate('demoSettings') }}</h3>
     <button type="button" :disabled="resetPending" @click="resetToDemo">
       {{ translate('demoReset') }}
     </button>

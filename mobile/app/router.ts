@@ -4,7 +4,6 @@ import ProductEditorPage from './pages/ProductEditorPage.vue'
 import ProfilePage from './pages/ProfilePage.vue'
 import RitualEditorPage from './pages/RitualEditorPage.vue'
 import RitualsPage from './pages/RitualsPage.vue'
-import SettingsPage from './pages/SettingsPage.vue'
 
 export const router = createRouter({
   history: createWebHashHistory(),
@@ -47,12 +46,7 @@ export const router = createRouter({
       alias: '/profile/rituals/:ritualId/edit',
       meta: { navSection: 'rituals' },
     },
-    {
-      path: '/profile/settings',
-      name: 'settings',
-      component: SettingsPage,
-      meta: { navSection: 'profile' },
-    },
+    { path: '/profile/settings', redirect: { name: 'profile' } },
     { path: '/:pathMatch(.*)*', redirect: { name: 'home' } },
   ],
 })

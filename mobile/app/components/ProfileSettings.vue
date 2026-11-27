@@ -14,8 +14,8 @@ const draftExpiryWarningDays = ref<number | string>(expiryWarningDays.value)
 </script>
 
 <template>
-  <section>
-    <h1>{{ translate('settings') }}</h1>
+  <section aria-labelledby="profile-settings-title">
+    <h2 id="profile-settings-title">{{ translate('settings') }}</h2>
     <p>
       <label for="app-language">{{ translate('language') }}</label>
       <select id="app-language" v-model="locale">

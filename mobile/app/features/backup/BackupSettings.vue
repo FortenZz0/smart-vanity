@@ -115,7 +115,7 @@ async function resetBackup() {
 
 <template>
   <section class="product-backup" aria-labelledby="product-backup-title">
-    <h2 id="product-backup-title">{{ translate('productBackup') }}</h2>
+    <h3 id="product-backup-title">{{ translate('productBackup') }}</h3>
     <div class="product-backup__actions">
       <button type="button" :disabled="backupBusy" aria-haspopup="dialog" @click="openOptions('export')">
         {{ translate('productBackupExport') }}
