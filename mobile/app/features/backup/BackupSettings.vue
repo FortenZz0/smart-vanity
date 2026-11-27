@@ -196,10 +196,6 @@ async function resetBackup() {
 </template>
 
 <style scoped>
-.product-backup {
-  margin-block-start: 1.5rem;
-}
-
 .product-backup__option {
   display: block;
   margin-block-end: 0.75rem;
@@ -215,7 +211,7 @@ async function resetBackup() {
   box-sizing: border-box;
   inline-size: min(24rem, calc(100% - 2rem));
   border: 1px solid var(--color-divider);
-  border-radius: 0.875rem;
+  border-radius: var(--radius-card);
   background: var(--color-surface);
   color: var(--color-text);
 }
@@ -233,6 +229,7 @@ async function resetBackup() {
 }
 
 .product-backup__reset:enabled {
+  background: var(--color-expiry-warning-bg);
   color: var(--color-expiry-warning-text);
 }
 </style>

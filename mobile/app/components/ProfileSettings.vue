@@ -14,7 +14,7 @@ const draftExpiryWarningDays = ref<number | string>(expiryWarningDays.value)
 </script>
 
 <template>
-  <section aria-labelledby="profile-settings-title">
+  <section class="profile-settings" aria-labelledby="profile-settings-title">
     <h2 id="profile-settings-title">{{ translate('settings') }}</h2>
     <p>
       <label for="app-language">{{ translate('language') }}</label>
@@ -80,11 +80,84 @@ const draftExpiryWarningDays = ref<number | string>(expiryWarningDays.value)
 </template>
 
 <style scoped>
-.advanced-settings {
-  margin-block-start: 1.5rem;
+.profile-settings {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.profile-settings h2 {
+  margin: 0 0 0.125rem;
+  font-size: 1.35rem;
+  letter-spacing: -0.025em;
+}
+
+.profile-settings > :is(p, form, section, details) {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0.875rem;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.profile-settings > p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.profile-settings form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.profile-settings form label {
+  grid-column: 1 / -1;
+}
+
+.profile-settings :is(label, summary) {
+  font-weight: 600;
+}
+
+.profile-settings > p select {
+  max-inline-size: 100%;
+}
+
+.profile-settings :deep(h3) {
+  margin-block: 0 0.625rem;
+  font-size: 1rem;
+}
+
+.profile-settings :deep(button) {
+  min-block-size: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+}
+
+.profile-settings :deep(button:disabled) {
+  opacity: 0.6;
+}
+
+.profile-settings button[type='submit']:enabled {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.advanced-settings summary {
+  cursor: pointer;
 }
 
 .advanced-settings form {
-  margin-block-start: 0.75rem;
+  margin-block-start: 1rem;
+  padding-block-start: 0.875rem;
+  border-block-start: 1px solid var(--color-divider);
 }
 </style>

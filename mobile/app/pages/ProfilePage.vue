@@ -211,7 +211,11 @@ function savePhoto() {
   display: grid;
   justify-items: center;
   gap: 0.75rem;
-  margin-block: 1rem;
+  margin-block: 1.25rem 1.75rem;
+  padding: 1.5rem 1rem;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-soft);
 }
 
 .profile-photo {
@@ -221,10 +225,11 @@ function savePhoto() {
   aspect-ratio: 1;
   overflow: hidden;
   padding: 0;
-  border: 2px solid var(--color-accent);
+  border: 3px solid var(--color-surface);
   border-radius: 50%;
   background: var(--color-photo-placeholder);
   color: var(--color-text-muted);
+  box-shadow: 0 0 0 1px var(--color-divider), var(--shadow-card);
   cursor: pointer;
 }
 
@@ -242,27 +247,20 @@ function savePhoto() {
 }
 
 .profile-name {
-  box-sizing: border-box;
   inline-size: min(100%, 18rem);
-  min-block-size: 2.75rem;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-text-muted);
-  border-radius: 0.5rem;
-  background: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
+  font-weight: 600;
   text-align: center;
-}
-
-.profile-name::placeholder {
-  color: var(--color-text-muted);
-  opacity: 1;
 }
 
 .photo-editor {
   display: grid;
   gap: 0.75rem;
-  inline-size: min(100%, 18rem);
+  box-sizing: border-box;
+  inline-size: min(100%, 20rem);
+  padding: 0.875rem;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
 }
 
 .photo-editor h2 {
@@ -274,6 +272,7 @@ function savePhoto() {
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
+  border-radius: var(--radius-control);
   background: var(--color-photo-placeholder);
   touch-action: none;
   cursor: grab;
@@ -313,7 +312,7 @@ function savePhoto() {
 .photo-editor__actions button {
   min-block-size: 2.75rem;
   border: 1px solid var(--color-divider);
-  border-radius: 0.375rem;
+  border-radius: var(--radius-control);
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;

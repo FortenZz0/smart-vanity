@@ -39,9 +39,3 @@ async function resetToDemo() {
     <p v-if="resetMessage" role="status">{{ translate(resetMessage) }}</p>
   </section>
 </template>
-
-<style scoped>
-.demo-settings {
-  margin-block-start: 1.5rem;
-}
-</style>
