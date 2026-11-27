@@ -4,7 +4,6 @@ import { syncRitualNotifications } from '../rituals/ritualNotifications'
 
 export async function resetLocalData(
   options: { products: boolean; rituals: boolean },
-  seedStatements: readonly string[] = [],
 ): Promise<void> {
   if (!options.products && !options.rituals) return
 
@@ -16,7 +15,6 @@ export async function resetLocalData(
   if (options.rituals) {
     statements.push('DELETE FROM ritual_reminders;', 'DELETE FROM ritual_skips;', 'DELETE FROM rituals;')
   }
-  statements.push(...seedStatements)
   await writeDatabaseTransaction(statements.map((statement) => ({ statement, values: [] })))
   if (options.rituals) syncRitualNotifications()
 
