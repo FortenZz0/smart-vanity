@@ -2,5 +2,10 @@
   "appId": "ru.filinda.smartvanity",
   "appName": "Smart Vanity",
   "webDir": "dist",
-  "zoomEnabled": false
+  "zoomEnabled": false,
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "notification_icon"
+    }
+  }
 }

@@ -50,6 +50,7 @@
   "ritualReminderActionError": "Не удалось изменить напоминания. Попробуйте ещё раз.",
   "ritualRestoreError": "Не удалось вернуть ритуал из архива. Попробуйте ещё раз.",
   "ritualNotificationBody": "Время выполнить ритуал",
+  "ritualNotificationPersonalizedBody": "{name}, время выполнить ритуал.",
   "ritualTomorrow": "завтра",
   "ritualNextReminderUnavailable": "Нет ближайшего напоминания",
   "addRitualReminder": "Добавить напоминание",

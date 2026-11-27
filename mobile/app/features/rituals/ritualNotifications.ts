@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core'
 import { LocalNotifications, type LocalNotificationSchema, type Schedule, type Weekday } from '@capacitor/local-notifications'
 import { translate } from '../../locales'
+import { readProfileName } from '../profile/profileName'
 import { getNextRitualReminder } from './nextRitualReminder'
 import type { Ritual } from './ritual'
 import { listRituals } from './ritualRepository'
@@ -64,7 +65,10 @@ async function reconcileNotifications(requestPermission: boolean): Promise<void>
 
   const usedIds = new Set([...pending, ...delivered].map(({ id }) => id))
   let nextId = 1
-  const body = translate('ritualNotificationBody')
+  const name = readProfileName()
+  const body = name
+    ? translate('ritualNotificationPersonalizedBody').replace('{name}', () => name)
+    : translate('ritualNotificationBody')
   const now = new Date()
   const notifications: LocalNotificationSchema[] = []
   const exact = display === 'granted' && (await LocalNotifications.checkExactNotificationSetting()).exact_alarm === 'granted'

@@ -50,6 +50,7 @@
   "ritualReminderActionError": "Could not update reminders. Try again.",
   "ritualRestoreError": "Could not restore the ritual. Try again.",
   "ritualNotificationBody": "Time for your ritual",
+  "ritualNotificationPersonalizedBody": "{name}, it's time for your ritual.",
   "ritualTomorrow": "tomorrow",
   "ritualNextReminderUnavailable": "No upcoming reminder",
   "addRitualReminder": "Add reminder",

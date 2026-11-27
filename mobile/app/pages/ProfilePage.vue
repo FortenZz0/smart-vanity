@@ -2,12 +2,13 @@
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
 import profileIcon from '../../assets/icons/person.svg'
 import ProfileSettings from '../components/ProfileSettings.vue'
+import { normalizeProfileName, readProfileName, storeProfileName } from '../features/profile/profileName'
+import { syncRitualNotifications } from '../features/rituals/ritualNotifications'
 import { translate } from '../locales'
 
-const nameKey = 'smart-vanity.profile-name'
 const photoKey = 'smart-vanity.profile-photo'
 const profileIconMask = `url(${JSON.stringify(profileIcon)})`
-const name = ref('')
+const name = ref(readProfileName())
 const photo = ref('')
 const photoInput = ref<HTMLInputElement | null>(null)
 const draftUrl = ref('')
@@ -32,12 +33,7 @@ const crop = computed(() => {
   return { side, width, height, x, y }
 })
 
-function normalizeName(value: string): string {
-  return /^[\s\p{Default_Ignorable_Code_Point}\p{Cc}]*$/u.test(value) ? '' : value.trim()
-}
-
 try {
-  name.value = normalizeName(localStorage.getItem(nameKey) ?? '')
   photo.value = localStorage.getItem(photoKey) ?? ''
 } catch {
   // The profile can still be displayed when local storage is unavailable.
@@ -45,13 +41,13 @@ try {
 
 function saveName(event: Event) {
   const input = event.currentTarget as HTMLInputElement
-  const normalized = normalizeName(input.value)
+  const normalized = normalizeProfileName(input.value)
   if (event.type === 'blur') input.value = normalized
   name.value = input.value
   try {
-    if (normalized) localStorage.setItem(nameKey, normalized)
-    else localStorage.removeItem(nameKey)
+    storeProfileName(normalized)
     nameFailed.value = false
+    if (event.type === 'blur') syncRitualNotifications()
   } catch {
     nameFailed.value = true
   }

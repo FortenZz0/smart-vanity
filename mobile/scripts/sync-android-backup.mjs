@@ -1,4 +1,4 @@
-import { copyFile, readFile, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 
 const source = new URL('../native/SmartVanityBackupPlugin.java', import.meta.url)
 const buildFile = new URL('../android/app/build.gradle', import.meta.url)
@@ -37,6 +37,9 @@ if (!build.includes(applyReleaseScript)) {
 
 const manifestFile = new URL('../android/app/src/main/AndroidManifest.xml', import.meta.url)
 const manifest = await readFile(manifestFile, 'utf8')
+let updatedManifest = manifest.replace(/<application\b[^>]*>/, (application) =>
+  application.replace(/android:(icon|roundIcon)="[^"]*"/g, 'android:$1="@mipmap/ic_smart_vanity"'),
+)
 const filters = `<!-- Smart Vanity backup files -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -53,8 +56,28 @@ const filters = `<!-- Smart Vanity backup files -->
                 <data android:host="*" android:pathPattern=".*\\\\.sv" />
                 <data android:mimeType="*/*" />
             </intent-filter>`
-if (!manifest.includes(filters)) {
+if (!updatedManifest.includes(filters)) {
   const end = '</activity>'
-  if (!manifest.includes(end)) throw new Error('Could not register the Android backup intent filters')
-  await writeFile(manifestFile, manifest.replace(end, `${filters}\n        ${end}`))
+  if (!updatedManifest.includes(end)) throw new Error('Could not register the Android backup intent filters')
+  updatedManifest = updatedManifest.replace(end, `${filters}\n        ${end}`)
 }
+if (updatedManifest !== manifest) await writeFile(manifestFile, updatedManifest)
+
+const resources = new URL('../android/app/src/main/res/', import.meta.url)
+const launcherResources = [
+  ['../assets/logo.png', 'mipmap-nodpi/smart_vanity_logo.png'],
+  ['../native/res/mipmap-anydpi-v26/ic_smart_vanity.xml', 'mipmap-anydpi-v26/ic_smart_vanity.xml'],
+  ['../native/res/values/smart_vanity_icon.xml', 'values/smart_vanity_icon.xml'],
+]
+for (const [sourcePath, resourcePath] of launcherResources) {
+  const destination = new URL(resourcePath, resources)
+  await mkdir(new URL('./', destination), { recursive: true })
+  await copyFile(new URL(sourcePath, import.meta.url), destination)
+}
+
+const notificationDrawables = new URL('../android/app/src/main/res/drawable-xxxhdpi/', import.meta.url)
+await mkdir(notificationDrawables, { recursive: true })
+await copyFile(
+  new URL('../assets/notification_icon.png', import.meta.url),
+  new URL('notification_icon.png', notificationDrawables),
+)

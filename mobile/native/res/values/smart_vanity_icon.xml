@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="smart_vanity_icon_background">#FAF1E8</color>
+    <item type="mipmap" name="ic_smart_vanity">@mipmap/smart_vanity_logo</item>
+</resources>
