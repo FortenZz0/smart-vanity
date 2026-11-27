@@ -43,6 +43,7 @@
   "ritualReminderTime": "Время напоминания",
   "skipRitualReminder": "Пропустить ближайшее напоминание",
   "undoRitualSkip": "Вернуть последнее пропущенное напоминание",
+  "ritualActions": "Действия с ритуалом",
   "pauseRitual": "Приостановить напоминания",
   "resumeRitual": "Возобновить напоминания",
   "ritualPaused": "На паузе",

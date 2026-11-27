@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 import { RouterLink } from 'vue-router'
-import pauseIcon from '../../../assets/icons/pause_circle.svg'
-import playIcon from '../../../assets/icons/play_circle.svg'
-import skipIcon from '../../../assets/icons/skip_next.svg'
-import previousIcon from '../../../assets/icons/skip_previous.svg'
+import moreIcon from '../../../assets/icons/more_vert.svg'
 import restoreIcon from '../../../assets/icons/unarchive.svg'
 import { translate } from '../../locales'
 import { getNextRitualReminder } from './nextRitualReminder'
@@ -17,6 +14,11 @@ const props = withDefaults(defineProps<{ ritual: Ritual; now?: Date; interactive
 })
 const emit = defineEmits<{ updated: [ritual: Ritual] }>()
 const pending = ref(false)
+const actionsOpen = ref(false)
+const actionsAbove = ref(false)
+const actions = ref<HTMLElement | null>(null)
+const actionsButton = ref<HTMLButtonElement | null>(null)
+const actionsId = useId()
 const actionError = ref<'ritualReminderActionError' | 'ritualRestoreError' | null>(null)
 
 const archived = computed(() => props.ritual.archivedAt !== null)
@@ -36,6 +38,29 @@ const reminderDate = computed(() => {
   return `${day}.${month}`
 })
 
+watch(actionsOpen, (open, _, onCleanup) => {
+  if (!open) return
+  function dismiss(event: PointerEvent) {
+    if (!actions.value?.contains(event.target as Node)) actionsOpen.value = false
+  }
+  document.addEventListener('pointerdown', dismiss)
+  onCleanup(() => document.removeEventListener('pointerdown', dismiss))
+})
+
+function closeActions() {
+  actionsOpen.value = false
+  actionsButton.value?.focus()
+}
+
+function toggleActions() {
+  if (pending.value) return
+  if (!actionsOpen.value && actionsButton.value) {
+    const { top, bottom } = actionsButton.value.getBoundingClientRect()
+    actionsAbove.value = window.innerHeight - bottom < 200 && top > window.innerHeight - bottom
+  }
+  actionsOpen.value = !actionsOpen.value
+}
+
 async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
   if (!props.interactive || pending.value || archived.value !== (action === 'restore')) return
   const { id, paused, skippedThrough } = props.ritual
@@ -43,6 +68,7 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
   if (action === 'previous' && (!canUndo.value || skippedThrough === null)) return
   if (action === 'next' && !next) return
 
+  if (actionsOpen.value) closeActions()
   pending.value = true
   actionError.value = null
   try {
@@ -93,35 +119,34 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
         <span :style="{ maskImage: `url(${JSON.stringify(restoreIcon)})` }" aria-hidden="true"></span>
       </button>
     </div>
-    <div v-else-if="interactive" class="ritual-card__actions">
+    <div
+      v-else-if="interactive"
+      ref="actions"
+      class="ritual-card__actions"
+      :class="{ 'ritual-card__actions--open': actionsOpen, 'ritual-card__actions--above': actionsAbove }"
+      @keydown.esc.stop="actionsOpen && closeActions()"
+      @focusout="!actions?.contains($event.relatedTarget as Node) && (actionsOpen = false)"
+    >
       <button
+        ref="actionsButton"
         type="button"
-        :aria-label="translate('undoRitualSkip')"
-        :title="translate('undoRitualSkip')"
-        :disabled="pending || !canUndo"
-        @click="updateRitual('previous')"
+        :aria-label="translate('ritualActions')"
+        :aria-expanded="actionsOpen"
+        :aria-controls="actionsId"
+        :aria-disabled="pending"
+        @click="toggleActions"
       >
-        <span :style="{ maskImage: `url(${JSON.stringify(previousIcon)})` }" aria-hidden="true"></span>
+        <span :style="{ maskImage: `url(${JSON.stringify(moreIcon)})` }" aria-hidden="true"></span>
       </button>
-      <button
-        class="ritual-card__toggle"
-        type="button"
-        :aria-label="pauseLabel"
-        :title="pauseLabel"
-        :disabled="pending"
-        @click="updateRitual('pause')"
-      >
-        <span :style="{ maskImage: `url(${JSON.stringify(ritual.paused ? playIcon : pauseIcon)})` }" aria-hidden="true"></span>
-      </button>
-      <button
-        type="button"
-        :aria-label="translate('skipRitualReminder')"
-        :title="translate('skipRitualReminder')"
-        :disabled="pending || !reminder"
-        @click="updateRitual('next')"
-      >
-        <span :style="{ maskImage: `url(${JSON.stringify(skipIcon)})` }" aria-hidden="true"></span>
-      </button>
+      <div v-show="actionsOpen" :id="actionsId" class="ritual-card__menu">
+        <button type="button" :disabled="pending || !canUndo" @click="updateRitual('previous')">
+          {{ translate('undoRitualSkip') }}
+        </button>
+        <button type="button" :disabled="pending" @click="updateRitual('pause')">{{ pauseLabel }}</button>
+        <button type="button" :disabled="pending || !reminder" @click="updateRitual('next')">
+          {{ translate('skipRitualReminder') }}
+        </button>
+      </div>
     </div>
     <p v-if="actionError" class="ritual-card__error" role="alert">{{ translate(actionError) }}</p>
   </article>
@@ -192,14 +217,44 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
   grid-row: 1;
 }
 
-.ritual-card__actions .ritual-card__toggle {
-  background: var(--color-selected-bg);
-  color: var(--color-accent);
+.ritual-card__actions--open {
+  z-index: 2;
 }
 
-.ritual-card__actions button:disabled {
+.ritual-card__actions button:is(:disabled, [aria-disabled='true']) {
   opacity: 0.55;
   cursor: default;
+}
+
+.ritual-card__menu {
+  position: absolute;
+  inset-block-start: calc(100% + 0.25rem);
+  inset-inline-end: 0;
+  inline-size: max-content;
+  max-inline-size: min(15rem, calc(100vw - 3.5rem));
+  padding: 0.25rem;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.ritual-card__menu button {
+  inline-size: 100%;
+  block-size: auto;
+  min-block-size: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  place-items: center start;
+  color: var(--color-text);
+  text-align: start;
+}
+
+.ritual-card__actions--above .ritual-card__menu {
+  inset-block: auto calc(100% + 0.25rem);
+}
+
+.ritual-card__menu button:enabled:is(:hover, :focus-visible) {
+  background: var(--color-surface-soft);
 }
 
 .ritual-card__actions span {
@@ -234,16 +289,5 @@ async function updateRitual(action: 'previous' | 'pause' | 'next' | 'restore') {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   overflow-wrap: anywhere;
-}
-
-@media (max-width: 22.5rem) {
-  .ritual-card--with-actions {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .ritual-card__actions {
-    grid-area: auto;
-    justify-self: end;
-  }
 }
 </style>

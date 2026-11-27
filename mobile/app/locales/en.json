@@ -43,6 +43,7 @@
   "ritualReminderTime": "Reminder time",
   "skipRitualReminder": "Skip the next reminder",
   "undoRitualSkip": "Restore the last skipped reminder",
+  "ritualActions": "Ritual actions",
   "pauseRitual": "Pause reminders",
   "resumeRitual": "Resume reminders",
   "ritualPaused": "Paused",
