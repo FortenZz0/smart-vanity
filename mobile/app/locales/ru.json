@@ -2,7 +2,7 @@
   "home": "Главная",
   "profile": "Профиль",
   "profileName": "Имя",
-  "profileGuest": "Гость",
+  "profileNamePlaceholder": "Введите имя",
   "profileChangePhoto": "Выбрать фото профиля",
   "profilePhotoError": "Не удалось сохранить фото профиля",
   "profileNameError": "Не удалось сохранить имя",

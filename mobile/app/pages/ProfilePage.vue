@@ -14,17 +14,25 @@ const savingPhoto = ref(false)
 const nameFailed = ref(false)
 const photoFailed = ref(false)
 
+function normalizeName(value: string): string {
+  return /^[\s\p{Default_Ignorable_Code_Point}\p{Cc}]*$/u.test(value) ? '' : value.trim()
+}
+
 try {
-  name.value = localStorage.getItem(nameKey) ?? ''
+  name.value = normalizeName(localStorage.getItem(nameKey) ?? '')
   photo.value = localStorage.getItem(photoKey) ?? ''
 } catch {
   // The profile can still be displayed when local storage is unavailable.
 }
 
 function saveName(event: Event) {
-  name.value = (event.currentTarget as HTMLInputElement).value
+  const input = event.currentTarget as HTMLInputElement
+  const normalized = normalizeName(input.value)
+  if (event.type === 'blur') input.value = normalized
+  name.value = input.value
   try {
-    localStorage.setItem(nameKey, name.value)
+    if (normalized) localStorage.setItem(nameKey, normalized)
+    else localStorage.removeItem(nameKey)
     nameFailed.value = false
   } catch {
     nameFailed.value = true
@@ -86,9 +94,10 @@ async function changePhoto(event: Event) {
         type="text"
         autocomplete="name"
         :aria-label="translate('profileName')"
-        :placeholder="translate('profileGuest')"
+        :placeholder="translate('profileNamePlaceholder')"
         :value="name"
         @input="saveName"
+        @blur="saveName"
       />
       <p v-if="nameFailed" class="profile-error" role="alert">{{ translate('profileNameError') }}</p>
     </div>
