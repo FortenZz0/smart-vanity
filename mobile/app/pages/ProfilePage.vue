@@ -86,7 +86,7 @@ async function changePhoto(event: Event) {
         type="text"
         autocomplete="name"
         :aria-label="translate('profileName')"
-        :placeholder="translate('profileName')"
+        :placeholder="translate('profileGuest')"
         :value="name"
         @input="saveName"
       />
@@ -142,6 +142,11 @@ async function changePhoto(event: Event) {
   color: var(--color-text);
   font: inherit;
   text-align: center;
+}
+
+.profile-name::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
 }
 
 .profile-error {

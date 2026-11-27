@@ -2,6 +2,7 @@
   "home": "Home",
   "profile": "Profile",
   "profileName": "Name",
+  "profileGuest": "Guest",
   "profileChangePhoto": "Choose profile photo",
   "profilePhotoError": "Could not save the profile photo",
   "profileNameError": "Could not save the name",
