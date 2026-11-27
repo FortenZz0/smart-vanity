@@ -2,9 +2,11 @@ import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { copyFile, mkdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { loadEnvFile } from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 const mobileDir = fileURLToPath(new URL('../', import.meta.url))
+const releaseEnvFile = fileURLToPath(new URL('../../.env', import.meta.url))
 const androidDir = path.join(mobileDir, 'android')
 const windows = process.platform === 'win32'
 const wrapper = windows ? 'gradlew.bat' : './gradlew'
@@ -30,6 +32,7 @@ async function buildApk() {
 
   run(process.execPath, [process.env.npm_execpath, 'run', 'build'], mobileDir)
   run(process.execPath, [process.env.npm_execpath, 'run', 'android:sync'], mobileDir)
+  if (flag === '--release' && existsSync(releaseEnvFile)) loadEnvFile(releaseEnvFile)
   const task = gradleTasks[flag]
   if (windows) run(`${wrapper} ${task}`, [], androidDir, true)
   else run(wrapper, [task], androidDir)
