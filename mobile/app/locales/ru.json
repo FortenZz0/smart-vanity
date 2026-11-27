@@ -1,6 +1,10 @@
 {
   "home": "Главная",
   "profile": "Профиль",
+  "profileName": "Имя",
+  "profileChangePhoto": "Выбрать фото профиля",
+  "profilePhotoError": "Не удалось сохранить фото профиля",
+  "profileNameError": "Не удалось сохранить имя",
   "navigation": "Разделы приложения",
   "rituals": "Ритуалы",
   "homeSearchPlaceholder": "Поиск продуктов и ритуалов",

@@ -1,6 +1,10 @@
 {
   "home": "Home",
   "profile": "Profile",
+  "profileName": "Name",
+  "profileChangePhoto": "Choose profile photo",
+  "profilePhotoError": "Could not save the profile photo",
+  "profileNameError": "Could not save the name",
   "navigation": "App sections",
   "rituals": "Rituals",
   "homeSearchPlaceholder": "Search products and rituals",
